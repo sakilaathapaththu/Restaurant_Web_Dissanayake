@@ -8,7 +8,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SchoolIcon from '@mui/icons-material/School';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../Utils/AuthContext'; // adjust path if needed
 // import API, { IMAGE_BASE_URL } from "../../Utils/api";
 import Logo from '../../Asset/images/Logo.png'; // Ensure you have a logo image in this path
 
@@ -26,7 +25,7 @@ export default function HomepageNavbar() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { user, logout } = useAuth() || { user: null, logout: () => {} };
+
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -52,14 +51,6 @@ export default function HomepageNavbar() {
     handleCloseNavMenu();
   };
 
-  const handleUserAction = (action) => {
-    if (action === 'logout') {
-      logout();
-    } else if (action === 'profile') {
-      navigate('/profile');
-    }
-    handleCloseUserMenu();
-  };
 
   return (
     <AppBar 
@@ -77,7 +68,7 @@ export default function HomepageNavbar() {
             sx={{ 
               display: { xs: 'none', md: 'flex' }, 
               alignItems: 'center',
-              mr: -10
+              mr: 40
             }}
           >
             <img
@@ -169,7 +160,7 @@ export default function HomepageNavbar() {
               style={{
                 height: '150px',
                 width: 'auto',
-                marginRight: '8px',
+                marginRight: '-300px',
                 cursor: 'pointer'
               }}
               onClick={() => navigate('/')}
@@ -209,93 +200,6 @@ export default function HomepageNavbar() {
                 {page}
               </Button>
             ))}
-          </Box>
-
-          {/* User Profile Section */}
-          <Box sx={{ flexGrow: 0 }}>
-            {user ? (
-              <>
-                <Tooltip title="Open settings">
-                  <IconButton 
-                    onClick={handleOpenUserMenu} 
-                    sx={{ p: 0 }}
-                  >
-                    <Avatar 
-                      sx={{ 
-                        backgroundColor: '#fda021',
-                        color: '#3c1300',
-                        width: 40,
-                        height: 40
-                      }}
-                    >
-                      {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                    </Avatar>
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-appbar-user"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                  PaperProps={{
-                    sx: {
-                      backgroundColor: '#3c1300',
-                      border: '1px solid #fda021',
-                      borderRadius: '8px'
-                    }
-                  }}
-                >
-                  <MenuItem onClick={() => handleUserAction('profile')}>
-                    <Typography 
-                      textAlign="center"
-                      sx={{ color: '#fda021', fontWeight: 500 }}
-                    >
-                      Profile
-                    </Typography>
-                  </MenuItem>
-                  <MenuItem onClick={() => handleUserAction('logout')}>
-                    <Typography 
-                      textAlign="center"
-                      sx={{ color: '#fda021', fontWeight: 500 }}
-                    >
-                      Logout
-                    </Typography>
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Button
-                onClick={() => navigate('/login')}
-                sx={{
-                  color: '#fda021',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  border: '2px solid #fda021',
-                  borderRadius: '25px',
-                  px: 3,
-                  py: 1,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: '#fda021',
-                    color: '#3c1300',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-                  }
-                }}
-              >
-                Sign In
-              </Button>
-            )}
           </Box>
         </Toolbar>
       </Container>
