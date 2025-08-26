@@ -6,10 +6,6 @@ import {
   useMediaQuery,
   styled 
 } from '@mui/material';
-import { 
-  ArrowBackIos, 
-  ArrowForwardIos 
-} from '@mui/icons-material';
 
 // Import images
 import img1 from '../../Asset/images/img1.png';
@@ -327,7 +323,7 @@ const HomeCarousel = () => {
       </ImagesContainer>
 
       {/* Dot Indicators - Only show if more than 1 image */}
-      {images.length > 1 && (
+      {/* {images.length > 1 && (
         <DotContainer>
           {images.map((_, index) => (
             <Dot
@@ -339,7 +335,7 @@ const HomeCarousel = () => {
             />
           ))}
         </DotContainer>
-      )}
+      )} */}
     </CarouselContainer>
   );
 };
