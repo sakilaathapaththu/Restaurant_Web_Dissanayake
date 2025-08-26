@@ -6,18 +6,28 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
 app.use(express.json());
 app.use(morgan("tiny"));
 
 
 
+const adminRoutes = require("./routes/adminRoutes");
+
 const connect = require("./database/connection.js");
 
 // Ensure we have a DB connection per request on Vercel
-app.use(async (_req, _res, next) => { await connect(); next(); });
+app.use(async (_req, _res, next) => {
+  try { await connect(); next(); } catch (e) { next(e); }
+});
+
 
 // Routes
+
+app.use("/api/admins", adminRoutes);
+
+// health
+app.get("/", (_req, res) => res.json({ ok: true }));
 
 
 // ✅ On Vercel, export the app instead of listening
