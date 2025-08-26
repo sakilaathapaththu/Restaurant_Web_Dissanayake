@@ -13,6 +13,7 @@ export default function Home() {
     <>
       <HomepageNavbar />
       <Homecarousel />
+      <Highlights />
       {/* 
       <Aboutsection />
       <Featuredmanu />
