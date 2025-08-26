@@ -5,11 +5,10 @@ import {
   useTheme, useMediaQuery
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import SchoolIcon from '@mui/icons-material/School';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useNavigate } from 'react-router-dom';
 // import API, { IMAGE_BASE_URL } from "../../Utils/api";
 import Logo from '../../Asset/images/Logo.png'; // Ensure you have a logo image in this path
+import mobilelogo from '../../Asset/images/mobile logo.png'; // Ensure you have a logo image in this path
 
 const pages = ['Home', 'Menu', 'About', 'Contact Us'];
 const pageRoutes = {
@@ -69,7 +68,7 @@ export default function HomepageNavbar() {
           <Toolbar 
             disableGutters 
             sx={{ 
-              minHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' },
+              minHeight: { xs: '80px', sm: '100px', md: '110px', lg: '140px' },
               maxHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' },
               overflow: 'hidden',
               display: 'flex',
@@ -234,10 +233,10 @@ export default function HomepageNavbar() {
               }}
             >
               <img
-                src={Logo}
+                src={mobilelogo}
                 alt="Restaurant Logo"
                 style={{
-                  height: '70px',
+                  height: '60px',
                   width: 'auto',
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
