@@ -6,6 +6,8 @@ import Login from "./Pages/Login";
 import Dashboard from "./Pages/admin/Dashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import CreateAdmin from "./Pages/admin/CreateAdmin";
+import Home from "./Pages/homepage";
+
 
 const theme = createTheme({
   palette: { mode: "light", background: { default: "#F6F9FC" } },
@@ -18,7 +20,9 @@ export default function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
 
           {/* Protected route */}
@@ -40,6 +44,16 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
