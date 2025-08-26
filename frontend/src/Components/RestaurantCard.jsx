@@ -1,4 +1,3 @@
-// src/Components/RestaurantCard.js
 import React from 'react';
 import {
   Card,

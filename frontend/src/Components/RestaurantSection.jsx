@@ -1,4 +1,3 @@
-// src/Components/RestaurantSection.js
 import React from 'react';
 import {
   Box,
@@ -136,7 +135,8 @@ const RestaurantSection = ({ title, restaurants, showSeeAll = true }) => {
           {/* Desktop Horizontal Scroll */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, minWidth: 'max-content' }}>
             {restaurants.map((restaurant) => (
-              <Box key={restaurant.id} sx={{ flexShrink: 0 }}>
+              <Box key={restaurant.id} 
+              sx={{ flexShrink: 0 }}>
                 <RestaurantCard restaurant={restaurant} />
               </Box>
             ))}

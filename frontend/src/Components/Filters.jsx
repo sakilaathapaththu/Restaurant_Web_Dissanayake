@@ -1,4 +1,3 @@
-// src/Components/Filters.js
 import React, { useState } from 'react';
 import {
   Box,

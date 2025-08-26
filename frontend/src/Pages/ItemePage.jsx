@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import Header from '../Components/Header';
+// import Header from '../Components/Header';
 import SearchBar from '../Components/SearchBar';
 import Filters from '../Components/Filters';
 import PromoBanner from '../Components/PromoBanner';
@@ -117,7 +117,7 @@ const Items = () => {
   const nearbyRestaurants = [
     {
       id: 10,
-      name: 'Pizza Hut',
+      name: 'Pizza Hutgg',
       rating: 4.1,
       reviewCount: 12000,
       deliveryTime: '30',
@@ -163,7 +163,7 @@ const Items = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: '#f6f6f6' }}>
-      <Header />
+      {/* <Header /> */}
       <SearchBar />
       <Filters />
       <PromoBanner />
