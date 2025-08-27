@@ -85,7 +85,7 @@ const PromoBanner = () => {
                 color: promo.textColor,
                 position: 'relative',
                 overflow: 'hidden',
-                height: 160,
+                height: 260,
               }}
             >
               <CardContent

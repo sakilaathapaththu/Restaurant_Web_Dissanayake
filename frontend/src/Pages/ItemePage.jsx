@@ -162,7 +162,7 @@ const Items = () => {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', backgroundColor: '#f6f6f6' }}>
+    <Box sx={{ py: 3, backgroundColor: 'white' }}>
       {/* <Header /> */}
       <SearchBar />
       <Filters />

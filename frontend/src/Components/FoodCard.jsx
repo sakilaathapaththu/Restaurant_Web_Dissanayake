@@ -23,6 +23,7 @@ const FoodCard = ({ food }) => {
     <Card
       sx={{
         maxWidth: 350,
+        m: 1,
         cursor: 'pointer',
         transition: 'all 0.3s ease-in-out',
         '&:hover': {
