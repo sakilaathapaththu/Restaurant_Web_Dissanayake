@@ -1,3 +1,4 @@
+
 // src/App.jsx (or wherever you define routes)
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
@@ -9,6 +10,8 @@ import AddCategory from "./Pages/admin/categories/AddCategory";
 import CategoriesList from "./Pages/admin/categories/CategoriesList";
 import AddItem from "./Pages/admin/items/AddItem";
 import ItemsList from "./Pages/admin/items/ItemsList";
+import Items from './Pages/ItemePage';
+
 
 
 export default function App() {
@@ -70,6 +73,8 @@ export default function App() {
     </RequireRole>
   </ProtectedRoute>
 } />
+        <Route path="/ggt" element={<Items />} />
+        <Route path="/ggtest" element={<Items />} />
         <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>
