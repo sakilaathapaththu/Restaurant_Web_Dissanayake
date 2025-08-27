@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box } from '@mui/material';
 // import Header from '../Components/Header';
-import SearchBar from '../Components/SearchBar';
-import Filters from '../Components/Filters';
-import PromoBanner from '../Components/PromoBanner';
-import FoodSection from '../Components/FoodSection';
+import SearchBar from '../Components/itemsCo/SearchBar';
+import Filters from '../Components/itemsCo/Filters';
+import PromoBanner from '../Components/itemsCo/PromoBanner';
+import FoodSection from '../Components/itemsCo/FoodSection';
 
 const Items = () => {
   const popularFoods = [
