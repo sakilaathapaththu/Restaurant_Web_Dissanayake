@@ -7,7 +7,7 @@ import PromoBanner from '../Components/itemsCo/PromoBanner';
 import FoodSection from '../Components/itemsCo/FoodSection';
 
 // Import food lists
-import { popularFoods, speedyDeliveries, nearbyRestaurants } from '../Components/itemsCo/foodList';
+import { popularFoods, speedyDeliveries, nearbyRestaurants, ggtest } from '../Components/itemsCo/foodList';
 
 const ItemsPage = () => {
   return (
@@ -18,7 +18,7 @@ const ItemsPage = () => {
       <PromoBanner />
 
       <FoodSection title="Popular Foods" foods={popularFoods} />
-      <FoodSection title="Speedy deliveries" foods={speedyDeliveries} />
+      <FoodSection title="ggtest" foods={ggtest} />
       <FoodSection title="More foods" foods={nearbyRestaurants} showSeeAll={false} />
     </Box>
   );
