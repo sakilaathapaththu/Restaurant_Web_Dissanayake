@@ -26,6 +26,12 @@ app.use(async (_req, _res, next) => {
 
 app.use("/api/admins", adminRoutes);
 
+const categoryRoutes = require("./routes/categoryRoutes");
+app.use("/api/categories", categoryRoutes);
+
+const menuItemRoutes = require("./routes/menuItemRoutes");
+app.use("/api/menu-items", menuItemRoutes);
+
 // health
 app.get("/", (_req, res) => res.json({ ok: true }));
 
