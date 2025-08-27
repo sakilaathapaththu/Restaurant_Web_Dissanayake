@@ -8,7 +8,6 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import CreateAdmin from "./Pages/admin/CreateAdmin";
 import Home from "./Pages/homepage";
 
-
 const theme = createTheme({
   palette: { mode: "light", background: { default: "#F6F9FC" } },
   shape: { borderRadius: 12 }
@@ -20,12 +19,14 @@ export default function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
+          {/* Default route - redirect to home */}
           <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          
+          {/* Public routes */}
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
 
-          {/* Protected route */}
+          {/* Protected routes */}
           <Route
             path="/dashboard"
             element={
@@ -35,7 +36,6 @@ export default function App() {
             }
           />
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
           <Route
             path="/admins/create"
             element={
@@ -45,15 +45,8 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-
+          {/* Catch all route - redirect to login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
