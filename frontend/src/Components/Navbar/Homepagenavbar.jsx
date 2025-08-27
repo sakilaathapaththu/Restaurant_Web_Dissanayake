@@ -7,8 +7,8 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from 'react-router-dom';
 // import API, { IMAGE_BASE_URL } from "../../Utils/api";
-import Logo from '../../Asset/images/Logo.png'; // Ensure you have a logo image in this path
-import mobilelogo from '../../Asset/images/mobile logo.png'; // Ensure you have a logo image in this path
+import Logo from '../../Asset/images/Logo.png'; // logo image path
+import mobilelogo from '../../Asset/images/mobile logo.png'; // logo image path
 
 const pages = ['Home', 'Menu', 'About', 'Contact Us'];
 const pageRoutes = {
@@ -68,8 +68,8 @@ export default function HomepageNavbar() {
           <Toolbar 
             disableGutters 
             sx={{ 
-              minHeight: { xs: '80px', sm: '100px', md: '110px', lg: '140px' },
-              maxHeight: { xs: '80px', sm: '100px', md: '120px', lg: '140px' },
+              minHeight: { xs: '70px', sm: '85px', md: '95px', lg: '110px' },
+              maxHeight: { xs: '70px', sm: '85px', md: '95px', lg: '110px' },
               overflow: 'hidden',
               display: 'flex',
               alignItems: 'center'
@@ -100,8 +100,6 @@ export default function HomepageNavbar() {
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
                 }}
-                onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
-                onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                 onClick={() => navigate('/')}
               />
             </Box>
@@ -241,8 +239,6 @@ export default function HomepageNavbar() {
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
                 }}
-                onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-                onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                 onClick={() => navigate('/')}
               />
             </Box>
@@ -257,7 +253,7 @@ export default function HomepageNavbar() {
     {/* Spacer div to push content below fixed navbar */}
     <Box 
       sx={{ 
-        height: { xs: '80px', sm: '100px', md: '120px', lg: '140px' },
+        height: { xs: '70px', sm: '85px', md: '95px', lg: '110px' },
         width: '100%'
       }} 
     />
