@@ -5,23 +5,18 @@ import {
   useTheme, useMediaQuery
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 // import API, { IMAGE_BASE_URL } from "../../Utils/api";
 import Logo from '../../Asset/images/Logo.png'; // logo image path
 import mobilelogo from '../../Asset/images/mobile logo.png'; // logo image path
 
 const pages = ['Home', 'Menu', 'About', 'Contact Us'];
-const pageRoutes = {
-  Home: '/',
-  Menu: '/menu',
-  'Contact Us': '/contactus',
-  'About': '/aboutus',
-};
 
 export default function HomepageNavbar() {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -41,12 +36,43 @@ export default function HomepageNavbar() {
     setAnchorElUser(null);
   };
 
-  const handleNavigate = (page) => {
-    const route = pageRoutes[page];
-    if (route) {
-      navigate(route);
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navbarHeight = isMobile ? 70 : 110; // Account for fixed navbar height
+      const elementPosition = element.offsetTop - navbarHeight;
+      
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
     }
+  };
+
+  const handleNavigate = (page) => {
     handleCloseNavMenu();
+    
+    // If we're not on the home page, navigate to home first
+    if (location.pathname !== '/home' && location.pathname !== '/') {
+      navigate('/home');
+      // Wait for navigation to complete before scrolling
+      setTimeout(() => {
+        const sectionId = page.toLowerCase().replace(' ', '');
+        if (sectionId === 'contactus') {
+          scrollToSection('contact');
+        } else {
+          scrollToSection(sectionId);
+        }
+      }, 100);
+    } else {
+      // We're already on home page, just scroll
+      const sectionId = page.toLowerCase().replace(' ', '');
+      if (sectionId === 'contactus') {
+        scrollToSection('contact');
+      } else {
+        scrollToSection(sectionId);
+      }
+    }
   };
 
   return (
@@ -92,10 +118,10 @@ export default function HomepageNavbar() {
               }}
             >
               <img
-                src={Logo}
+                src={mobilelogo}
                 alt="Restaurant Logo"
                 style={{
-                  height: '200px',
+                  height: '100px',
                   width: 'auto',
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
