@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Grid,
-  Container,
-} from '@mui/material';
+import { Box, Typography, Button, Grid, Container } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import FoodCard from './FoodCard';
 
@@ -33,17 +27,10 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
             px: 2,
           }}
         >
-          <Typography
-            variant="h5"
-            component="h2"
-            sx={{
-              fontWeight: 'bold',
-              color: '#000',
-            }}
-          >
+          <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', color: '#000' }}>
             {title}
           </Typography>
-          
+
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {showSeeAll && (
               <Button
@@ -53,19 +40,16 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
                   color: '#06c167',
                   textTransform: 'none',
                   fontWeight: 'bold',
-                  '&:hover': {
-                    backgroundColor: 'transparent',
-                    textDecoration: 'underline',
-                  },
+                  '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
                 }}
               >
                 {showAll ? 'Show less' : 'See all'}
               </Button>
             )}
-            
-            {/* Navigation Arrows (hidden if showAll is true) */}
+
+            {/* Navigation Arrows (always visible) */}
             {!showAll && (
-              <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
                   onClick={() => scroll('left')}
                   variant="outlined"
@@ -77,10 +61,7 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
                     borderRadius: '50%',
                     borderColor: '#ddd',
                     color: '#666',
-                    '&:hover': {
-                      borderColor: '#06c167',
-                      color: '#06c167',
-                    },
+                    '&:hover': { borderColor: '#06c167', color: '#06c167' },
                   }}
                 >
                   <ChevronLeft />
@@ -96,10 +77,7 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
                     borderRadius: '50%',
                     borderColor: '#ddd',
                     color: '#666',
-                    '&:hover': {
-                      borderColor: '#06c167',
-                      color: '#06c167',
-                    },
+                    '&:hover': { borderColor: '#06c167', color: '#06c167' },
                   }}
                 >
                   <ChevronRight />
@@ -111,12 +89,12 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
 
         {/* Food Cards */}
         {!showAll ? (
-          // Scrollable section
+          // Scrollable Section
           <Box
             ref={scrollRef}
             sx={{
-              display: { xs: 'block', md: 'flex' },
-              overflowX: { xs: 'visible', md: 'auto' },
+              display: 'flex',
+              overflowX: 'auto',
               gap: 2,
               px: 2,
               scrollBehavior: 'smooth',
@@ -125,25 +103,17 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
               scrollbarWidth: 'none',
             }}
           >
-            {/* Mobile Grid */}
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-              <Grid container spacing={2}>
-                {foods.slice(0, 4).map((food) => ( // only first few in mobile scroll
-                  <Grid item xs={12} sm={6} key={food.id}>
-                    <FoodCard food={food} />
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-
-            {/* Desktop Horizontal Scroll */}
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, minWidth: 'max-content' }}>
-              {foods.map((food) => (
-                <Box key={food.id} sx={{ flexShrink: 0 }}>
-                  <FoodCard food={food} />
-                </Box>
-              ))}
-            </Box>
+            {foods.map((food) => (
+              <Box
+                key={food.id}
+                sx={{
+                  flexShrink: 0,
+                  minWidth: { xs: '30%', sm: '200px', md: '280px' }, // 3 cards min on mobile
+                }}
+              >
+                <FoodCard food={food} />
+              </Box>
+            ))}
           </Box>
         ) : (
           // Expanded Grid View (See all mode)
