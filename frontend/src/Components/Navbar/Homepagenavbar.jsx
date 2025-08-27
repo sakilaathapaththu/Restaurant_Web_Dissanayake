@@ -121,7 +121,7 @@ export default function HomepageNavbar() {
                 src={mobilelogo}
                 alt="Restaurant Logo"
                 style={{
-                  height: '100px',
+                  height: '80px',
                   width: 'auto',
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
