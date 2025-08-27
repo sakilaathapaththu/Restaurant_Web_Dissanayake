@@ -1,15 +1,16 @@
+const getFoodImage = (filename) => require(`../../Asset/images/foods/${filename}`);
+
 export const popularFoods = [
   {
     id: 1,
     name: 'Chicken Fried Rice',
-    price: 750,  
-    rating: 4.3,              
-    reviewCount: 5000,        
-    deliveryTime: '15',     
-    deliveryFee: 0,         
-    image: '/api/placeholder/300/180', 
-    categories: ['Rice', 'Sri Lankan', 'Seafood'], 
-    offer: 'Spend LKR 3,500, Save LKR 800', 
+    price: 750,
+    rating: 4.3,
+    reviewCount: 5000,
+    deliveryFee: 0,
+    image: getFoodImage('chicken-fried-rice.jpg'),
+    categories: ['Rice', 'Sri Lankan', 'Seafood'],
+    offer: 'Spend LKR 3,500, Save LKR 800',
     distance: 2.5
   },
   {
