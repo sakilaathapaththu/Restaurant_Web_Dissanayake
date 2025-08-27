@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 import SearchBar from '../Components/SearchBar';
 import Filters from '../Components/Filters';
 import PromoBanner from '../Components/PromoBanner';
-import RestaurantSection from '../Components/RestaurantSection';
+import FoodSection from '../Components/FoodSection';
 
 const Items = () => {
   const popularRestaurants = [
@@ -168,17 +168,17 @@ const Items = () => {
       <Filters />
       <PromoBanner />
 
-      <RestaurantSection
+      <FoodSection
         title="Popular near you"
         restaurants={popularRestaurants}
       />
 
-      <RestaurantSection
+      <FoodSection
         title="Speedy deliveries"
         restaurants={speedyDeliveries}
       />
 
-      <RestaurantSection
+      <FoodSection
         title="More restaurants"
         restaurants={nearbyRestaurants}
         showSeeAll={false}

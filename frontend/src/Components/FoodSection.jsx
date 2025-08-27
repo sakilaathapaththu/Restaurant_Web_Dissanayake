@@ -7,9 +7,9 @@ import {
   Container,
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import RestaurantCard from './RestaurantCard';
+import FoodCard from './FoodCard';
 
-const RestaurantSection = ({ title, restaurants, showSeeAll = true }) => {
+const FoodSection = ({ title, restaurants, showSeeAll = true }) => {
   const scrollRef = React.useRef(null);
 
   const scroll = (direction) => {
@@ -126,7 +126,7 @@ const RestaurantSection = ({ title, restaurants, showSeeAll = true }) => {
             <Grid container spacing={2}>
               {restaurants.map((restaurant) => (
                 <Grid item xs={12} sm={6} key={restaurant.id}>
-                  <RestaurantCard restaurant={restaurant} />
+                  <FoodCard restaurant={restaurant} />
                 </Grid>
               ))}
             </Grid>
@@ -137,7 +137,7 @@ const RestaurantSection = ({ title, restaurants, showSeeAll = true }) => {
             {restaurants.map((restaurant) => (
               <Box key={restaurant.id} 
               sx={{ flexShrink: 0 }}>
-                <RestaurantCard restaurant={restaurant} />
+                <FoodCard restaurant={restaurant} />
               </Box>
             ))}
           </Box>
@@ -147,4 +147,4 @@ const RestaurantSection = ({ title, restaurants, showSeeAll = true }) => {
   );
 };
 
-export default RestaurantSection;
+export default FoodSection;

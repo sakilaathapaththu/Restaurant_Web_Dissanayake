@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { Favorite, FavoriteBorder, AccessTime, LocalOffer } from '@mui/icons-material';
 
-const RestaurantCard = ({ restaurant }) => {
+const FoodCard = ({ restaurant }) => {
   const [isFavorite, setIsFavorite] = React.useState(false);
 
   const handleFavoriteClick = (e) => {
@@ -27,7 +27,7 @@ const RestaurantCard = ({ restaurant }) => {
         transition: 'all 0.3s ease-in-out',
         '&:hover': {
           transform: 'translateY(-2px)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          boxShadow: '0 4px 20px rgba(124, 124, 124, 0.22)',
         },
         borderRadius: 2,
         overflow: 'hidden',
@@ -174,4 +174,4 @@ const RestaurantCard = ({ restaurant }) => {
   );
 };
 
-export default RestaurantCard;
+export default FoodCard;
