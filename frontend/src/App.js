@@ -4,18 +4,33 @@ import Login from "./Pages/Login";
 import Dashboard from "./Pages/admin/Dashboard";
 import AddAdmin from "./Pages/admin/AddAdmin";
 import ProtectedRoute from "./Components/ProtectedRoute";
+
 import RequireRole from "./Components/RequireRole";
 import AddCategory from "./Pages/admin/categories/AddCategory";
 import CategoriesList from "./Pages/admin/categories/CategoriesList";
 import AddItem from "./Pages/admin/items/AddItem";
 import ItemsList from "./Pages/admin/items/ItemsList";
 import Items from "./Pages/ItemePage";
+import CreateAdmin from "./Pages/admin/CreateAdmin";
+import Home from "./Pages/homepage";
+
+const theme = createTheme({
+  palette: { mode: "light", background: { default: "#F6F9FC" } },
+  shape: { borderRadius: 12 }
+});
 
 export default function App() {
   return (
+    <ThemeProvider theme={theme}>
+    <CssBaseline />
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+          {/* Default route - redirect to home */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          
+          {/* Public routes */}
+          <Route path="/home" element={<Home />} />
 
         <Route
           path="/dashboard"
