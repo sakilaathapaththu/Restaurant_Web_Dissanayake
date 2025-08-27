@@ -1,12 +1,13 @@
 import * as React from "react";
 import {
-  Box, Card, CardActionArea, CardContent, Grid, Typography
+  Box, Card, CardActionArea, CardContent, Grid, Typography, Button
 } from "@mui/material";
 import {
   Campaign as CampaignIcon,
   Work as WorkIcon,
   Edit as EditIcon,
   ListAlt as ListIcon,
+  Logout as LogoutIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ResponsiveLayout from "../../Components/Dashboard/ResponsiveLayout";
@@ -25,8 +26,30 @@ export default function Dashboard() {
 
   const visibleTiles = tiles.filter(t => !t.roles || t.roles.includes(role));
 
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("admin");
+    } finally {
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <ResponsiveLayout>
+      {/* Top-right logout button */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <Button
+          onClick={handleLogout}
+          startIcon={<LogoutIcon />}
+          variant="outlined"
+          color="inherit"
+          sx={{ borderRadius: 2 }}
+        >
+          Logout
+        </Button>
+      </Box>
+
       <Grid container spacing={2}>
         {visibleTiles.map((t) => (
           <Grid key={t.label} item xs={12} md={6}>

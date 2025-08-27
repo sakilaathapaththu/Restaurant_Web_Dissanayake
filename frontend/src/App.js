@@ -1,47 +1,31 @@
-// src/App.js
-import * as React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+// src/App.jsx (or wherever you define routes)
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/admin/Dashboard";
+import AddAdmin from "./Pages/admin/AddAdmin";
 import ProtectedRoute from "./Components/ProtectedRoute";
-import CreateAdmin from "./Pages/admin/CreateAdmin";
-
-const theme = createTheme({
-  palette: { mode: "light", background: { default: "#F6F9FC" } },
-  shape: { borderRadius: 12 }
-});
+import RequireRole from "./Components/RequireRole";
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
 
-          {/* Protected route */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+        <Route path="/dashboard" element={
+          <ProtectedRoute><Dashboard /></ProtectedRoute>
+        } />
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
-          <Route
-            path="/admins/create"
-            element={
-              <ProtectedRoute roles={["superadmin"]}>
-                <CreateAdmin />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+        <Route path="/admins/create" element={
+          <ProtectedRoute>
+            <RequireRole roles={["superadmin"]}>
+              <AddAdmin />
+            </RequireRole>
+          </ProtectedRoute>
+        } />
+
+        <Route path="*" element={<Login />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

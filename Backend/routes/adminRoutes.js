@@ -1,18 +1,24 @@
-const router = require("express").Router();
-const adminCtrl = require("../controllers/adminController");
+const express = require("express");
+const { createAdmin, getAdmins, loginAdmin, getMe } = require("../controllers/adminController");
 const auth = require("../middlewares/auth");
 const requireRole = require("../middlewares/requireRole");
 
-// Register admin (first time open, later only superadmin)
-router.post("/register", adminCtrl.register);
+const router = express.Router();
 
-// Login
-router.post("/login", adminCtrl.login);
+/**
+ * Public
+ */
+router.post("/login", loginAdmin);
 
-// Me
-router.get("/me", auth, adminCtrl.me);
+/**
+ * Protected (superadmin only for listing & creating admins)
+ */
+router.post("/", auth, requireRole("superadmin"), createAdmin); // POST /api/admins
+router.get("/", auth, requireRole("superadmin"), getAdmins);    // GET  /api/admins
 
-// Update admin (superadmin only)
-router.patch("/:id/status", auth, requireRole("superadmin"), adminCtrl.update);
+/**
+ * Protected (any logged-in admin)
+ */
+router.get("/me", auth, getMe);                                 // GET  /api/admins/me
 
 module.exports = router;
