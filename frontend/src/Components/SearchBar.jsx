@@ -27,7 +27,7 @@ const SearchBar = () => {
     <Box sx={{ px: 2, py: 2, backgroundColor: 'white' }}>
       <TextField
         fullWidth
-        placeholder="Search restaurants and food"
+        placeholder="Search foods and food"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         onFocus={() => setIsFocused(true)}

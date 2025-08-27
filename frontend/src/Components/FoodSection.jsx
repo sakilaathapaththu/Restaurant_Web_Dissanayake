@@ -9,7 +9,7 @@ import {
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import FoodCard from './FoodCard';
 
-const FoodSection = ({ title, restaurants, showSeeAll = true }) => {
+const FoodSection = ({ title, foods, showSeeAll = true }) => {
   const scrollRef = React.useRef(null);
 
   const scroll = (direction) => {
@@ -124,9 +124,9 @@ const FoodSection = ({ title, restaurants, showSeeAll = true }) => {
           {/* Mobile Grid Layout */}
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <Grid container spacing={2}>
-              {restaurants.map((restaurant) => (
-                <Grid item xs={12} sm={6} key={restaurant.id}>
-                  <FoodCard restaurant={restaurant} />
+              {foods.map((food) => (
+                <Grid item xs={12} sm={6} key={food.id}>
+                  <FoodCard food={food} />
                 </Grid>
               ))}
             </Grid>
@@ -134,10 +134,10 @@ const FoodSection = ({ title, restaurants, showSeeAll = true }) => {
 
           {/* Desktop Horizontal Scroll */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, minWidth: 'max-content' }}>
-            {restaurants.map((restaurant) => (
-              <Box key={restaurant.id} 
+            {foods.map((food) => (
+              <Box key={food.id} 
               sx={{ flexShrink: 0 }}>
-                <FoodCard restaurant={restaurant} />
+                <FoodCard food={food} />
               </Box>
             ))}
           </Box>

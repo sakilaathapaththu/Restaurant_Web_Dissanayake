@@ -7,7 +7,7 @@ import PromoBanner from '../Components/PromoBanner';
 import FoodSection from '../Components/FoodSection';
 
 const Items = () => {
-  const popularRestaurants = [
+  const popularFoods = [
     {
       id: 1,
       name: 'Dissanayake Restaurant',
@@ -169,18 +169,18 @@ const Items = () => {
       <PromoBanner />
 
       <FoodSection
-        title="Popular near you"
-        restaurants={popularRestaurants}
+        title="Popular Foods"
+        foods={popularFoods}
       />
 
       <FoodSection
         title="Speedy deliveries"
-        restaurants={speedyDeliveries}
+        foods={speedyDeliveries}
       />
 
       <FoodSection
-        title="More restaurants"
-        restaurants={nearbyRestaurants}
+        title="More foods"
+        foods={nearbyRestaurants}
         showSeeAll={false}
       />
     </Box>

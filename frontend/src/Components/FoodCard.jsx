@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { Favorite, FavoriteBorder, AccessTime, LocalOffer } from '@mui/icons-material';
 
-const FoodCard = ({ restaurant }) => {
+const FoodCard = ({ food }) => {
   const [isFavorite, setIsFavorite] = React.useState(false);
 
   const handleFavoriteClick = (e) => {
@@ -37,8 +37,8 @@ const FoodCard = ({ restaurant }) => {
         <CardMedia
           component="img"
           height="180"
-          image={restaurant.image}
-          alt={restaurant.name}
+          image={food.image}
+          alt={food.name}
           sx={{ objectFit: 'cover' }}
         />
         
@@ -64,9 +64,9 @@ const FoodCard = ({ restaurant }) => {
         </IconButton>
 
         {/* Offer Badge */}
-        {restaurant.offer && (
+        {food.offer && (
           <Chip
-            label={restaurant.offer}
+            label={food.offer}
             size="small"
             icon={<LocalOffer sx={{ fontSize: 14 }} />}
             sx={{
@@ -82,7 +82,7 @@ const FoodCard = ({ restaurant }) => {
         )}
 
         {/* Delivery Fee Badge */}
-        {restaurant.deliveryFee === 0 && (
+        {food.deliveryFee === 0 && (
           <Chip
             label="Free Delivery"
             size="small"
@@ -112,20 +112,20 @@ const FoodCard = ({ restaurant }) => {
             whiteSpace: 'nowrap',
           }}
         >
-          {restaurant.name}
+          {food.name}
         </Typography>
 
         {/* Rating and Reviews */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
           <Rating
-            value={restaurant.rating}
+            value={food.rating}
             readOnly
             size="small"
             precision={0.1}
             sx={{ mr: 1 }}
           />
           <Typography variant="body2" sx={{ color: '#666', fontSize: '14px' }}>
-            {restaurant.rating} ({restaurant.reviewCount.toLocaleString()})
+            {food.rating} ({food.reviewCount.toLocaleString()})
           </Typography>
         </Box>
 
@@ -134,17 +134,17 @@ const FoodCard = ({ restaurant }) => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <AccessTime sx={{ fontSize: 16, color: '#666', mr: 0.5 }} />
             <Typography variant="body2" sx={{ color: '#666' }}>
-              {restaurant.deliveryTime} min
+              {food.deliveryTime} min
             </Typography>
           </Box>
           <Typography variant="body2" sx={{ color: '#666' }}>
-            {restaurant.deliveryFee === 0 ? 'Free delivery' : `LKR ${restaurant.deliveryFee} delivery`}
+            {food.deliveryFee === 0 ? 'Free delivery' : `LKR ${food.deliveryFee} delivery`}
           </Typography>
         </Box>
 
         {/* Categories */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-          {restaurant.categories.slice(0, 3).map((category, index) => (
+          {food.categories.slice(0, 3).map((category, index) => (
             <Chip
               key={index}
               label={category}
@@ -158,16 +158,16 @@ const FoodCard = ({ restaurant }) => {
               }}
             />
           ))}
-          {restaurant.categories.length > 3 && (
+          {food.categories.length > 3 && (
             <Typography variant="body2" sx={{ color: '#666', fontSize: '11px', alignSelf: 'center' }}>
-              +{restaurant.categories.length - 3} more
+              +{food.categories.length - 3} more
             </Typography>
           )}
         </Box>
 
         {/* Distance */}
         <Typography variant="body2" sx={{ color: '#999', fontSize: '12px' }}>
-          {restaurant.distance} km away
+          {food.distance} km away
         </Typography>
       </CardContent>
     </Card>
