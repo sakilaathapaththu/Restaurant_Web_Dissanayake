@@ -9,17 +9,25 @@ import Simplecontact from "../Components/Home/Simplecontact";
 import Footer from "../Components/Home/Footer";
 
 export default function Home() {
-return (
+  return (
     <>
-    <HomepageNavbar />
-    <Homecarousel />
-    <Highlights />
-    <Featuredmanu />
-    <Footer />
-    {/* 
-    <Aboutsection />
-    <Simplecontact />
-      */}
+      <HomepageNavbar />
+      <div id="home">
+        <Homecarousel />
+      </div>
+      <div id="highlights">
+        <Highlights />
+      </div>
+      <div id="menu">
+        <Featuredmanu />
+      </div>
+      <div id="about">
+        <Aboutsection />
+      </div>
+      <div id="contact">
+        {/* <Simplecontact /> */}
+      </div>
+      <Footer />
     </>
-);
+  );
 }
