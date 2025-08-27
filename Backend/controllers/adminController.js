@@ -1,117 +1,106 @@
+const Admin = require("../models/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
 
-function signToken(admin) {
-  return jwt.sign(
-    { id: admin._id, role: admin.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-}
-
-exports.register = async (req, res) => {
+// Create new admin (superadmin only)
+exports.createAdmin = async (req, res, next) => {
   try {
-    const {
-      firstName, lastName, adminId,
-      username, email, password,
-      isActive = true, role, contactNo
-    } = req.body;
+    const { firstName, lastName, adminId, username, email, password, role, contactNo } = req.body;
 
-    if (!firstName || !lastName || !adminId || !username || !email || !password) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const totalAdmins = await Admin.countDocuments();
-    if (totalAdmins > 0) {
-      if (!req.admin?.role || req.admin.role !== "superadmin") {
-        return res.status(403).json({ error: "Only superadmin can create admins" });
-      }
+    if (!firstName || !lastName || !adminId || !username || !email || !password || !role) {
+      return res.status(400).json({ error: "All required fields must be filled." });
     }
 
     const exists = await Admin.findOne({ $or: [{ email }, { username }, { adminId }] });
-    if (exists) return res.status(409).json({ error: "Email/username/adminId already in use" });
+    if (exists) {
+      return res.status(400).json({ error: "Admin with this email/username/adminId already exists." });
+    }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
 
-    const newAdmin = await Admin.create({
-      firstName, lastName, adminId, username, email,
-      passwordHash, isActive, contactNo,
-      role: totalAdmins === 0 ? "superadmin" : (role || "editor"),
+    const admin = await Admin.create({
+      firstName,
+      lastName,
+      adminId,
+      username,
+      email,
+      passwordHash,
+      role,
+      contactNo
     });
 
-    const token = signToken(newAdmin);
     res.status(201).json({
-      admin: {
-        id: newAdmin._id, firstName, lastName, adminId,
-        username, email, isActive, role: newAdmin.role, contactNo
-      },
-      token
+      success: true,
+      data: {
+        id: admin._id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        email: admin.email,
+        username: admin.username,
+        role: admin.role
+      }
     });
-  } catch (e) {
-    res.status(500).json({ error: "Server error" });
+  } catch (err) {
+    next(err);
   }
 };
 
-exports.login = async (req, res) => {
+// List admins (superadmin only)
+exports.getAdmins = async (_req, res, next) => {
+  try {
+    const admins = await Admin.find().select("-passwordHash");
+    res.json({ success: true, data: admins });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// Login (email or username)
+exports.loginAdmin = async (req, res, next) => {
   try {
     const { usernameOrEmail, password } = req.body;
     if (!usernameOrEmail || !password) {
-      return res.status(400).json({ error: "Missing credentials" });
+      return res.status(400).json({ error: "usernameOrEmail and password are required" });
     }
 
-    const admin = await Admin.findOne({
-      $or: [
-        { email: usernameOrEmail.toLowerCase() },
-        { username: usernameOrEmail.toLowerCase() }
-      ]
-    });
-
+    const id = String(usernameOrEmail).toLowerCase().trim();
+    const admin = await Admin.findOne({ $or: [{ email: id }, { username: id }] });
     if (!admin) return res.status(401).json({ error: "Invalid credentials" });
+    if (!admin.isActive) return res.status(403).json({ error: "Account is disabled" });
 
     const ok = await bcrypt.compare(password, admin.passwordHash);
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
-    if (!admin.isActive) return res.status(403).json({ error: "Account inactive" });
 
-    const token = signToken(admin);
+    const token = jwt.sign(
+      { sub: admin._id.toString(), role: admin.role, username: admin.username, email: admin.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "7d" }
+    );
+
     res.json({
+      token,
       admin: {
-        id: admin._id, firstName: admin.firstName, lastName: admin.lastName,
-        adminId: admin.adminId, username: admin.username, email: admin.email,
-        isActive: admin.isActive, role: admin.role, contactNo: admin.contactNo
-      },
-      token
+        id: admin._id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role
+      }
     });
-  } catch {
-    res.status(500).json({ error: "Server error" });
+  } catch (err) {
+    next(err);
   }
 };
 
-exports.me = async (req, res) => {
+// Get current admin
+exports.getMe = async (req, res, next) => {
   try {
-    const admin = await Admin.findById(req.admin.id).select("-passwordHash");
-    if (!admin) return res.status(404).json({ error: "Not found" });
+    const admin = await Admin.findById(req.user.sub).select("-passwordHash");
+    if (!admin) return res.status(404).json({ error: "Admin not found" });
     res.json({ admin });
-  } catch {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-exports.update = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const allowed = ["firstName", "lastName", "isActive", "role", "contactNo"];
-    const payload = {};
-    for (const key of allowed) {
-      if (req.body[key] !== undefined) payload[key] = req.body[key];
-    }
-
-    const updated = await Admin.findByIdAndUpdate(id, payload, { new: true })
-      .select("-passwordHash");
-    if (!updated) return res.status(404).json({ error: "Admin not found" });
-
-    res.json({ admin: updated });
-  } catch {
-    res.status(500).json({ error: "Server error" });
+  } catch (err) {
+    next(err);
   }
 };
