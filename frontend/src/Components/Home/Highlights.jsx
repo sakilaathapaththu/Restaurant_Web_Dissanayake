@@ -343,40 +343,6 @@ const HighlightsSection = () => {
         </Grid>
 
         {/* Menu Button Section */}
-        <ScrollAnimation delay={400}>
-          <Box sx={{ 
-            textAlign: 'center', 
-            mt: { xs: 5, md: 6 },
-            mb: 2
-          }}>
-            <Zoom in timeout={600} style={{ transitionDelay: '500ms' }}>
-              <div>
-                <MenuButton 
-                  onClick={handleMenuClick}
-                  variant="contained"
-                >
-                  Discover Our Full Menu
-                </MenuButton>
-              </div>
-            </Zoom>
-            
-            {/* Subtle text below button */}
-            <Fade in timeout={800} style={{ transitionDelay: '700ms' }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#3d2400ff',
-                  opacity: 0.8,
-                  mt: 2,
-                  fontSize: '0.95rem',
-                  fontStyle: 'italic',
-                }}
-              >
-                Explore our complete collection of authentic flavors
-              </Typography>
-            </Fade>
-          </Box>
-        </ScrollAnimation>
       </Container>
     </Box>
   );
