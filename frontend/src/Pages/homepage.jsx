@@ -25,7 +25,7 @@ export default function Home() {
         <Aboutsection />
       </div>
       <div id="contact">
-        {/* <Simplecontact /> */}
+        <Simplecontact />
       </div>
       <Footer />
     </>
