@@ -2,6 +2,7 @@ export const popularFoods = [
   {
     id: 1,
     name: 'Chicken Fried Rice',
+    price: 750,  
     rating: 4.3,              
     reviewCount: 5000,        
     deliveryTime: '15',     

@@ -9,7 +9,7 @@ import {
   IconButton,
   Rating,
 } from '@mui/material';
-import { Favorite, FavoriteBorder, AccessTime, LocalOffer } from '@mui/icons-material';
+import { Favorite, FavoriteBorder, LocalOffer } from '@mui/icons-material';
 
 const FoodCard = ({ food }) => {
   const [isFavorite, setIsFavorite] = React.useState(false);
@@ -22,8 +22,8 @@ const FoodCard = ({ food }) => {
   return (
     <Card
       sx={{
-        width: 280, 
-        height: 370, 
+        width: 280,
+        height: 370,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -55,9 +55,7 @@ const FoodCard = ({ food }) => {
             top: 8,
             right: 8,
             backgroundColor: 'rgba(255,255,255,0.9)',
-            '&:hover': {
-              backgroundColor: 'rgba(255,255,255,1)',
-            },
+            '&:hover': { backgroundColor: 'rgba(255,255,255,1)' },
           }}
           size="small"
         >
@@ -86,7 +84,7 @@ const FoodCard = ({ food }) => {
           />
         )}
 
-        {/* Delivery Fee Badge */}
+        {/* Free Delivery Badge */}
         {food.deliveryFee === 0 && (
           <Chip
             label="Free Delivery"
@@ -104,18 +102,17 @@ const FoodCard = ({ food }) => {
         )}
       </Box>
 
-      {/* Content area with equalized space */}
       <CardContent
         sx={{
           p: 2,
-          flex: 1, 
+          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
         }}
       >
         <Box>
-          {/* Restaurant Name */}
+          {/* Food Name */}
           <Typography
             variant="h6"
             component="h3"
@@ -144,7 +141,7 @@ const FoodCard = ({ food }) => {
             </Typography>
           </Box>
 
-          {/* Delivery Info */}
+          {/* Price & Delivery Fee */}
           <Box
             sx={{
               display: 'flex',
@@ -153,14 +150,14 @@ const FoodCard = ({ food }) => {
               mb: 1,
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <AccessTime sx={{ fontSize: 16, color: '#666', mr: 0.5 }} />
-              <Typography variant="body2" sx={{ color: '#666' }}>
-                {food.deliveryTime} min
-              </Typography>
-            </Box>
+            <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#06c167' }}>
+              LKR {food.price?.toLocaleString()}
+            </Typography>
+
             <Typography variant="body2" sx={{ color: '#666' }}>
-              {food.deliveryFee === 0 ? 'Free delivery' : `LKR ${food.deliveryFee} delivery`}
+              {food.deliveryFee === 0
+                ? 'Free delivery'
+                : `LKR ${food.deliveryFee} delivery`}
             </Typography>
           </Box>
 
@@ -191,7 +188,7 @@ const FoodCard = ({ food }) => {
           </Box>
         </Box>
 
-        {/* Distance (always bottom aligned) */}
+        {/* Distance */}
         <Typography variant="body2" sx={{ color: '#999', fontSize: '12px', mt: 'auto' }}>
           {food.distance} km away
         </Typography>
