@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   Container,
@@ -10,24 +10,21 @@ import {
   Fade,
   useScrollTrigger,
   Chip,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-
-// Import dish images
-import img1 from '../../Asset/images/img1.jpg';
-import img2 from '../../Asset/images/img2.jpg';
-import img3 from '../../Asset/images/img3.jpg';
-import img4 from '../../Asset/images/img4.jpg';
-import img5 from '../../Asset/images/img5.jpg';
-import img6 from '../../Asset/images/img6.jpg';
-import img7 from '../../Asset/images/img7.jpg';
-import img8 from '../../Asset/images/img8.jpg';
-import img9 from '../../Asset/images/img9.jpg';
-import img10 from '../../Asset/images/img10.jpg';
+  Select,
+  MenuItem,
+  FormControl,
+  Button,
+  Divider,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import API from "../../Utils/api";
+// fallback image (replace with your asset)
+import fallbackImage from "../../Asset/images/foods/chicken-fried-rice.jpg";
 
 // Styled Components
 const SectionContainer = styled(Box)({
@@ -51,11 +48,9 @@ const SectionContainer = styled(Box)({
     left: 0,
     right: 0,
     bottom: 0,
-    background: `
-      radial-gradient(circle at 10% 20%, rgba(253, 160, 33, 0.05) 0%, transparent 50%),
+    background: `radial-gradient(circle at 10% 20%, rgba(253, 160, 33, 0.05) 0%, transparent 50%),
       radial-gradient(circle at 90% 80%, rgba(253, 160, 33, 0.05) 0%, transparent 50%),
-      linear-gradient(135deg, rgba(253, 160, 33, 0.02) 0%, transparent 50%)
-    `,
+      linear-gradient(135deg, rgba(253, 160, 33, 0.02) 0%, transparent 50%)`,
     pointerEvents: 'none',
   },
 });
@@ -155,9 +150,9 @@ const SliderTrack = styled(Box)({
 });
 
 const DishCard = styled(Card)({
-  minWidth: '320px',
-  width: '320px',
-  height: '420px',
+  minWidth: '340px',
+  width: '340px',
+  height: 'auto',
   margin: '0 16px',
   borderRadius: '24px',
   overflow: 'hidden',
@@ -168,6 +163,8 @@ const DishCard = styled(Card)({
   position: 'relative',
   cursor: 'pointer',
   flexShrink: 0,
+  display: 'flex',
+  flexDirection: 'column',
   '&:hover': {
     transform: 'translateY(-8px) scale(1.02)',
     boxShadow: '0 16px 48px rgba(60, 19, 0, 0.18)',
@@ -185,50 +182,46 @@ const DishCard = styled(Card)({
     },
   },
   '@media (max-width: 1024px)': {
-    minWidth: '300px',
-    width: '300px',
-    height: '400px',
+    minWidth: '320px',
+    width: '320px',
     margin: '0 14px',
   },
   '@media (max-width: 768px)': {
-    minWidth: '280px',
-    width: '280px',
-    height: '380px',
+    minWidth: '300px',
+    width: '300px',
     margin: '0 12px',
     borderRadius: '20px',
   },
   '@media (max-width: 480px)': {
-    minWidth: '260px',
-    width: '260px',
-    height: '360px',
+    minWidth: '280px',
+    width: '280px',
     margin: '0 10px',
     borderRadius: '16px',
   },
   '@media (max-width: 360px)': {
-    minWidth: '240px',
-    width: '240px',
-    height: '340px',
+    minWidth: '260px',
+    width: '260px',
     margin: '0 8px',
   },
 });
 
 const DishImage = styled(CardMedia)({
-  height: '240px',
+  height: '220px',
   position: 'relative',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
   '@media (max-width: 1024px)': {
-    height: '220px',
-  },
-  '@media (max-width: 768px)': {
     height: '200px',
   },
-  '@media (max-width: 480px)': {
+  '@media (max-width: 768px)': {
     height: '180px',
   },
-  '@media (max-width: 360px)': {
+  '@media (max-width: 480px)': {
     height: '160px',
+  },
+  '@media (max-width: 360px)': {
+    height: '140px',
   },
 });
 
@@ -269,6 +262,81 @@ const PriceChip = styled(Chip)({
     right: '10px',
     fontSize: '0.8rem',
     padding: '2px 6px',
+  },
+});
+
+const PortionSelector = styled(FormControl)({
+  width: '100%',
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: 'rgba(253, 160, 33, 0.05)',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(253, 160, 33, 0.08)',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#fda021',
+      },
+    },
+    '&.Mui-focused': {
+      backgroundColor: 'rgba(253, 160, 33, 0.1)',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#fda021',
+        borderWidth: '2px',
+      },
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'rgba(253, 160, 33, 0.3)',
+    },
+  },
+  '& .MuiSelect-select': {
+    padding: '12px 16px',
+    fontSize: '0.95rem',
+    fontWeight: 500,
+    color: '#3c1300',
+  },
+  '& .MuiInputLabel-root': {
+    color: '#3c1300',
+    fontWeight: 500,
+    '&.Mui-focused': {
+      color: '#fda021',
+    },
+  },
+});
+
+const PortionOption = styled(MenuItem)({
+  padding: '12px 16px',
+  '&:hover': {
+    backgroundColor: 'rgba(253, 160, 33, 0.08)',
+  },
+  '&.Mui-selected': {
+    backgroundColor: 'rgba(253, 160, 33, 0.15)',
+    '&:hover': {
+      backgroundColor: 'rgba(253, 160, 33, 0.2)',
+    },
+  },
+});
+
+const PriceDisplay = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '12px 16px',
+  backgroundColor: 'rgba(253, 160, 33, 0.05)',
+  borderRadius: '12px',
+  border: '1px solid rgba(253, 160, 33, 0.2)',
+});
+
+// Fixed bottom container for portion/price
+const FixedBottomSection = styled(Box)({
+  marginTop: 'auto',
+  padding: '16px 24px',
+  backgroundColor: '#ffffff',
+  borderTop: '1px solid rgba(253, 160, 33, 0.15)',
+  '@media (max-width: 768px)': {
+    padding: '14px 20px',
+  },
+  '@media (max-width: 480px)': {
+    padding: '12px 16px',
   },
 });
 
@@ -405,6 +473,8 @@ const ScrollAnimation = ({ children, delay = 0 }) => {
 };
 
 const DishesShowcaseSection = () => {
+  const [dishes, setDishes] = useState([]);
+  const [selectedPortions, setSelectedPortions] = useState({});
   const [currentTranslate, setCurrentTranslate] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -412,114 +482,76 @@ const DishesShowcaseSection = () => {
   const sliderRef = useRef(null);
   const navigate = useNavigate();
 
-  // Dishes data with imported images
-  const dishes = [
-    {
-      id: 1,
-      name: 'Chicken Salad',
-      description: 'Chicken salad combines tender chicken, fresh vegetables, herbs, and dressing for refreshing flavor.',
-      price: 'LKR 750.00',
-      category: 'Salad',
-      image: img1,
-    },
-    {
-      id: 2,
-      name: 'Cream of Chicken',
-      description: 'Creamy chicken soup blends tender chicken, vegetables, and rich broth for comfort.',
-      price: 'LKR 490.00',
-      category: 'Soups',
-      image: img2,
-    },
-    {
-      id: 3,
-      name: 'Crispy Chicken (250G)',
-      description: 'Crispy chicken features golden-brown coating, juicy meat, and satisfying crunchy texture.',
-      price: 'LKR 850.00',
-      category: 'Starters',
-      image: img3,
-    },
-    {
-      id: 4,
-      name: 'Watermelon Juice',
-      description: 'Watermelon juice offers refreshing sweetness, vibrant color, and natural hydrating summer delight.',
-      price: 'LKR 300.00',
-      category: 'Fruit Juice',
-      image: img4,
-    },
-    {
-      id: 5,
-      name: 'Chicken Fried Rice (Large)',
-      description: 'Chicken fried rice mixes Basmathi rice, chicken, vegetables, and savory flavors.',
-      price: 'LKR 1300.00',
-      category: 'Basmathi Rice',
-      image: img5,
-    },
-    {
-      id: 6,
-      name: 'Grilled Chicken Sizzling',
-      description: 'Experience the perfect blend of smoky flavors and juicy tenderness with our Grilled Chicken Sizzling',
-      price: 'LKR 3000.00',
-      category: 'Meat, Poultry & Seafood',
-      image: img6,
-    },
-    {
-      id: 7,
-      name: 'Chicken Kottu (Large)',
-      description: 'Savor the vibrant flavors of Sri Lanka with our hearty and spicy Chicken Kottu.',
-      price: 'LKR 1000.00',
-      category: 'Kottu',
-      image: img7,
-    },
-    {
-      id: 8,
-      name: 'Mixed Noodles (Large)',
-      description: 'Mixed Noodles is a flavorful dish combining a variety of noodles with vegetables, sauces, and spices.',
-      price: 'LKR 1150.00',
-      category: 'Noodles',
-      image: img8,
-    },
-    {
-      id: 9,
-      name: 'Cheese Chicken Pasta',
-      description: 'Cheese Chicken Pasta is a creamy, cheesy pasta with tender chicken.',
-      price: 'LKR 1000.00',
-      category: 'Pasta',
-      image: img9,
-    },
-    {
-      id: 10,
-      name: 'Chocolate Milkshake',
-      description: 'Chocolate Milkshake is a rich and creamy blend of chocolate and milk.',
-      price: 'LKR 600.00',
-      category: 'Milkshake',
-      image: img10,
-    },
-  ];
+  // 🔥 Fetch dishes from backend
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        const res = await API.get("/menu-items");
+        if (res.data.success) {
+          const foods = res.data.data.map((item) => ({
+            id: item._id,
+            menuId: item.menuId,
+            name: item.name,
+            description: item.description || "",
+            category: item.categoryName || "Uncategorized",
+            image: fallbackImage, // placeholder for now
+            portions: item.portions || [],
+            hasMultiplePortions: item.portions && item.portions.length > 1,
+          }));
+          setDishes(foods);
 
-  // Create extended array for infinite scroll
-  const extendedDishes = [...dishes, ...dishes, ...dishes];
-  const cardWidth = 352; // 320px + 32px margin
-  const totalOriginalWidth = dishes.length * cardWidth;
+          // Initialize selected portions for each dish
+          const initialSelections = {};
+          foods.forEach((dish) => {
+            if (dish.portions && dish.portions.length > 0) {
+              initialSelections[dish.id] = 0; // Default to first portion
+            }
+          });
+          setSelectedPortions(initialSelections);
+        }
+      } catch (err) {
+        console.error("Error fetching menu items:", err);
+      }
+    };
 
-  // Responsive card widths
-  const getCardWidth = () => {
-    if (window.innerWidth <= 360) return 256; // 240px + 16px margin
-    if (window.innerWidth <= 480) return 280; // 260px + 20px margin
-    if (window.innerWidth <= 768) return 304; // 280px + 24px margin
-    if (window.innerWidth <= 1024) return 328; // 300px + 28px margin
-    return 352; // 320px + 32px margin
+    fetchMenuItems();
+  }, []);
+
+  // Handle portion selection change
+  const handlePortionChange = (dishId, portionIndex) => {
+    setSelectedPortions(prev => ({
+      ...prev,
+      [dishId]: portionIndex
+    }));
   };
 
-  // Auto-slide functionality with infinite loop
+  // Get current price for a dish
+  const getCurrentPrice = (dish) => {
+    if (!dish.portions || dish.portions.length === 0) return "Price not available";
+    const selectedIndex = selectedPortions[dish.id] || 0;
+    const portion = dish.portions[selectedIndex];
+    return `LKR ${portion.finalPrice || portion.price || 0}`;
+  };
+
+  // Get current portion label
+  const getCurrentPortionLabel = (dish) => {
+    if (!dish.portions || dish.portions.length === 0) return "";
+    const selectedIndex = selectedPortions[dish.id] || 0;
+    const portion = dish.portions[selectedIndex];
+    return portion.label || "";
+  };
+
+  // ✅ slider setup
+  const extendedDishes = [...dishes, ...dishes, ...dishes];
+  const cardWidth = 372; // 340px + 32px margin
+  const totalOriginalWidth = dishes.length * cardWidth;
+
   useEffect(() => {
-    if (!isHovered && !isTransitioning) {
+    if (!isHovered && !isTransitioning && dishes.length > 0) {
       intervalRef.current = setInterval(() => {
         setCurrentTranslate((prev) => {
           const newTranslate = prev - cardWidth;
-          
-          // If we've moved past one full set, reset to beginning
           if (Math.abs(newTranslate) >= totalOriginalWidth) {
-            // Smooth transition to reset position
             setTimeout(() => {
               setIsTransitioning(true);
               setCurrentTranslate(0);
@@ -527,26 +559,20 @@ const DishesShowcaseSection = () => {
             }, 0);
             return newTranslate;
           }
-          
           return newTranslate;
         });
       }, 3000);
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isHovered, isTransitioning, cardWidth, totalOriginalWidth]);
+  }, [isHovered, isTransitioning, cardWidth, totalOriginalWidth, dishes]);
 
   const handlePrevious = () => {
     if (isTransitioning) return;
-    
     setCurrentTranslate((prev) => {
       const newTranslate = prev + cardWidth;
-      
-      // If moving forward past the beginning, jump to the end
       if (newTranslate > 0) {
         setIsTransitioning(true);
         setTimeout(() => {
@@ -555,18 +581,14 @@ const DishesShowcaseSection = () => {
         }, 0);
         return prev;
       }
-      
       return newTranslate;
     });
   };
 
   const handleNext = () => {
     if (isTransitioning) return;
-    
     setCurrentTranslate((prev) => {
       const newTranslate = prev - cardWidth;
-      
-      // If we've moved past one full set, reset to beginning
       if (Math.abs(newTranslate) >= totalOriginalWidth) {
         setIsTransitioning(true);
         setTimeout(() => {
@@ -575,18 +597,17 @@ const DishesShowcaseSection = () => {
         }, 0);
         return prev;
       }
-      
       return newTranslate;
     });
   };
 
   const handleMenuNavigation = () => {
-    navigate('/menu');
+    navigate("/menu");
   };
 
   return (
     <SectionContainer>
-      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
         {/* Section Header */}
         <ScrollAnimation>
           <Box>
@@ -594,8 +615,7 @@ const DishesShowcaseSection = () => {
               Culinary Collection
             </SectionTitle>
             <SectionSubtitle variant="h6">
-              Experience our finest dish collection, where every dish tells a story of passion, 
-              precision, and exceptional flavor profiles
+              Experience our finest dish collection, where every dish tells a story of passion, precision, and exceptional flavor profiles
             </SectionSubtitle>
           </Box>
         </ScrollAnimation>
@@ -606,7 +626,6 @@ const DishesShowcaseSection = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
-            {/* Navigation Buttons */}
             <NavigationButton
               className="prev"
               onClick={handlePrevious}
@@ -623,75 +642,140 @@ const DishesShowcaseSection = () => {
               <ArrowForwardIosIcon />
             </NavigationButton>
 
-            {/* Slider Track */}
             <SliderTrack
               ref={sliderRef}
               sx={{
                 transform: `translateX(${currentTranslate}px)`,
-                transition: isTransitioning ? 'none' : 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                transition: isTransitioning
+                  ? "none"
+                  : "transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
               }}
             >
               {extendedDishes.map((dish, index) => (
-                <DishCard key={`${dish.id}-${Math.floor(index / dishes.length)}`}>
-                  <Box sx={{ position: 'relative' }}>
+                <DishCard key={`${dish.id}-${index}`}>
+                  <Box sx={{ position: "relative" }}>
                     <DishImage
                       className="dish-image"
                       image={dish.image}
                       title={dish.name}
                     />
                     <ImageOverlay className="dish-overlay" />
-                    <PriceChip label={dish.price} />
+
+                    {/* Price Chip - Top Right */}
+                    <PriceChip label={getCurrentPrice(dish)} />
                   </Box>
-                  
-                  <CardContent 
+
+                  <CardContent
                     className="dish-content"
-                    sx={{ 
+                    sx={{
                       p: 3,
-                      transition: 'transform 0.3s ease',
-                      '@media (max-width: 768px)': {
+                      display: 'flex',
+                      flexDirection: 'column',
+                      flex: 1,
+                      transition: "transform 0.3s ease",
+                      "@media (max-width: 768px)": {
                         p: 2,
                       },
                     }}
                   >
-                    <Box sx={{ mb: 1 }}>
+                    {/* Category Chip */}
+                    <Box sx={{ mb: 2 }}>
                       <Chip
                         label={dish.category}
                         size="small"
                         sx={{
-                          backgroundColor: 'rgba(253, 160, 33, 0.1)',
-                          color: '#3c1300',
-                          fontSize: '0.75rem',
+                          backgroundColor: "rgba(253, 160, 33, 0.1)",
+                          color: "#3c1300",
+                          fontSize: "0.75rem",
                           fontWeight: 600,
                         }}
                       />
                     </Box>
-                    
+
+                    {/* Dish Name */}
                     <Typography
                       variant="h6"
                       component="h3"
                       sx={{
-                        color: '#3c1300',
+                        color: "#3c1300",
                         fontWeight: 700,
-                        fontSize: '1.2rem',
+                        fontSize: "1.2rem",
                         mb: 1,
                         lineHeight: 1.3,
                       }}
                     >
                       {dish.name}
                     </Typography>
-                    
+
+                    {/* Menu ID */}
                     <Typography
                       variant="body2"
                       sx={{
-                        color: '#3c1300',
+                        color: "#3c1300",
+                        opacity: 0.6,
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        mb: 1,
+                      }}
+                    >
+                      {dish.menuId}
+                    </Typography>
+
+                    {/* Description */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#3c1300",
                         opacity: 0.8,
                         lineHeight: 1.6,
-                        fontSize: '0.9rem',
+                        fontSize: "0.9rem",
+                        mb: 2,
                       }}
                     >
                       {dish.description}
                     </Typography>
                   </CardContent>
+
+                  {/* Fixed Bottom Section for Portion/Price */}
+                  <FixedBottomSection>
+                    {dish.hasMultiplePortions ? (
+                      <PortionSelector size="small">
+                        <Select
+                          value={selectedPortions[dish.id] || 0}
+                          onChange={(e) => handlePortionChange(dish.id, e.target.value)}
+                          displayEmpty
+                          IconComponent={ExpandMoreIcon}
+                          sx={{
+                            fontSize: '0.9rem',
+                            '& .MuiSelect-icon': { color: '#fda021' }
+                          }}
+                        >
+                          {dish.portions.map((portion, portionIndex) => (
+                            <PortionOption key={portionIndex} value={portionIndex}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                <Typography sx={{ fontWeight: 500, color: '#3c1300' }}>
+                                  {portion.label}
+                                </Typography>
+                                <Typography sx={{ fontWeight: 700, color: '#fda021' }}>
+                                  LKR {portion.finalPrice || portion.price}
+                                </Typography>
+                              </Box>
+                            </PortionOption>
+                          ))}
+                        </Select>
+                      </PortionSelector>
+                    ) : (
+                      // Single portion display
+                      <PriceDisplay>
+                        <Typography sx={{ fontWeight: 500, color: '#3c1300', fontSize: '0.9rem' }}>
+                          {getCurrentPortionLabel(dish) || "Standard"}
+                        </Typography>
+                        <Typography sx={{ fontWeight: 700, color: '#fda021', fontSize: '1.1rem' }}>
+                          {getCurrentPrice(dish)}
+                        </Typography>
+                      </PriceDisplay>
+                    )}
+                  </FixedBottomSection>
                 </DishCard>
               ))}
             </SliderTrack>
@@ -701,12 +785,12 @@ const DishesShowcaseSection = () => {
         {/* View Menu Button */}
         <ScrollAnimation delay={400}>
           <ViewMenuButton onClick={handleMenuNavigation}>
-            <RestaurantIcon 
+            <RestaurantIcon
               className="menu-icon"
-              sx={{ 
-                transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                fontSize: '1.3rem'
-              }} 
+              sx={{
+                transition: "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                fontSize: "1.3rem",
+              }}
             />
             <Typography component="span" sx={{ fontWeight: 600 }}>
               Explore Full Menu
