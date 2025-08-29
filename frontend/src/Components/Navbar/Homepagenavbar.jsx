@@ -39,7 +39,7 @@ export default function HomepageNavbar() {
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const navbarHeight = isMobile ? 70 : 110; // Account for fixed navbar height
+      const navbarHeight = isMobile ? 60 : 90; // Account for fixed navbar height
       const elementPosition = element.offsetTop - navbarHeight;
       
       window.scrollTo({
@@ -52,6 +52,13 @@ export default function HomepageNavbar() {
   const handleNavigate = (page) => {
     handleCloseNavMenu();
     
+    // Handle Menu navigation to separate page
+    if (page === 'Menu') {
+      navigate('/menu'); // Navigate to ItemePage.jsx route
+      return;
+    }
+    
+    // Handle other navigation (Home, About, Contact Us)
     // If we're not on the home page, navigate to home first
     if (location.pathname !== '/home' && location.pathname !== '/') {
       navigate('/home');
@@ -60,6 +67,8 @@ export default function HomepageNavbar() {
         const sectionId = page.toLowerCase().replace(' ', '');
         if (sectionId === 'contactus') {
           scrollToSection('contact');
+        } else if (sectionId === 'home') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           scrollToSection(sectionId);
         }
@@ -69,6 +78,8 @@ export default function HomepageNavbar() {
       const sectionId = page.toLowerCase().replace(' ', '');
       if (sectionId === 'contactus') {
         scrollToSection('contact');
+      } else if (sectionId === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         scrollToSection(sectionId);
       }
@@ -94,8 +105,8 @@ export default function HomepageNavbar() {
           <Toolbar 
             disableGutters 
             sx={{ 
-              minHeight: { xs: '70px', sm: '85px', md: '95px', lg: '110px' },
-              maxHeight: { xs: '70px', sm: '85px', md: '95px', lg: '110px' },
+              minHeight: { xs: '60px', sm: '70px', md: '80px', lg: '90px' },
+              maxHeight: { xs: '60px', sm: '70px', md: '80px', lg: '90px' },
               overflow: 'hidden',
               display: 'flex',
               alignItems: 'center'
@@ -121,7 +132,7 @@ export default function HomepageNavbar() {
                 src={mobilelogo}
                 alt="Restaurant Logo"
                 style={{
-                  height: '80px',
+                  height: '65px',
                   width: 'auto',
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
@@ -260,7 +271,7 @@ export default function HomepageNavbar() {
                 src={mobilelogo}
                 alt="Restaurant Logo"
                 style={{
-                  height: '60px',
+                  height: '50px',
                   width: 'auto',
                   cursor: 'pointer',
                   transition: 'transform 0.2s ease'
@@ -279,7 +290,7 @@ export default function HomepageNavbar() {
     {/* Spacer div to push content below fixed navbar */}
     <Box 
       sx={{ 
-        height: { xs: '70px', sm: '85px', md: '95px', lg: '110px' },
+        height: { xs: '60px', sm: '70px', md: '80px', lg: '90px' },
         width: '100%'
       }} 
     />

@@ -6,7 +6,6 @@ Typography,
 Grid,
 IconButton,
 Link,
-Divider,
 useTheme,
 useMediaQuery,
 Fade,
@@ -277,7 +276,7 @@ return (
                     <FooterText sx={{ mb: 1 }}>Monday - Saturday</FooterText>
                     <FooterText sx={{ mb: 1, opacity: 0.8 }}>7:00 AM - 10:00 PM</FooterText>
                     <FooterText sx={{ mb: 1 }}>Sunday</FooterText>
-                    <FooterText sx={{ mb: 0, opacity: 0.8 }}>8:00 AM - 9:00 PM</FooterText>
+                    <FooterText sx={{ mb: 0, opacity: 0.8 }}>7:00 AM - 10:00 PM</FooterText>
                     </Box>
                 </ContactItem>
                 </Box>
