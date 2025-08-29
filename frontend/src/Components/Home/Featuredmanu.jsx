@@ -601,8 +601,9 @@ const DishesShowcaseSection = () => {
     });
   };
 
+  // Navigate to the public ItemePage
   const handleMenuNavigation = () => {
-    navigate("/menu");
+    navigate('/menu'); // Navigate to ItemePage.jsx
   };
 
   return (
