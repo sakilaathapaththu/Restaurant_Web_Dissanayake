@@ -24,6 +24,12 @@ app.use(async (_req, _res, next) => {
 
 // Routes
 
+
+// inquiry routes
+const inquiryRoutes = require("./routes/inquiryRoutes");
+app.use("/api/inquiries", inquiryRoutes);
+
+// other routes
 app.use("/api/admins", adminRoutes);
 
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -34,6 +40,13 @@ app.use("/api/menu-items", menuItemRoutes);
 
 // health
 app.get("/", (_req, res) => res.json({ ok: true }));
+
+
+// ✅ NEW: JSON error handler (keep last)
+app.use((err, _req, res, _next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({ error: "Server error" });
+});
 
 
 // ✅ On Vercel, export the app instead of listening

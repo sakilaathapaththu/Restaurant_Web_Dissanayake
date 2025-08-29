@@ -12,6 +12,7 @@ import {
   Category as CategoryIcon,
   ViewList as ViewListIcon,
   Inventory2 as InventoryIcon, 
+  ListAlt as ListAltIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import ResponsiveLayout from "../../Components/Dashboard/ResponsiveLayout";
@@ -23,6 +24,8 @@ const tiles = [
   { label: "View Categories", icon: <ViewListIcon fontSize="large" />, color: "#6E59A5", to: "/categories", roles: ["superadmin","editor"] },
   { label: "Pending Orders", icon: <EditIcon fontSize="large" />, color: "#B1CB5C", to: "/orders/pending" },
   { label: "View All Orders", icon: <ListIcon fontSize="large" />, color: "#C9A2C8", to: "/orders" },
+  { label: "Inquiries", icon: <ListAltIcon fontSize="large" />, color: "#2D99FF", to: "/inquiries" },
+
 ];
 
 export default function Dashboard() {
