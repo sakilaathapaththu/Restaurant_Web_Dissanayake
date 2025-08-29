@@ -1,7 +1,7 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { CssBaseline } from "@mui/material";
+
+import { ThemeProvider, CssBaseline, createTheme } from "@mui/material";
 
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/admin/Dashboard";
@@ -12,8 +12,11 @@ import AddCategory from "./Pages/admin/categories/AddCategory";
 import CategoriesList from "./Pages/admin/categories/CategoriesList";
 import AddItem from "./Pages/admin/items/AddItem";
 import ItemsList from "./Pages/admin/items/ItemsList";
+
 import Items from "./Pages/ItemePage";
+
 import Home from "./Pages/homepage";
+import Items from "./Pages/admin/items/ItemsList"; // if you want /food route to work
 
 
 const theme = createTheme({
@@ -24,24 +27,25 @@ const theme = createTheme({
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
+      <CssBaseline />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
           {/* Default route - redirect to home */}
           <Route path="/" element={<Navigate to="/home" replace />} />
-          
+
           {/* Public routes */}
           <Route path="/home" element={<Home />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
         <Route
           path="/admins/create"
@@ -95,8 +99,9 @@ export default function App() {
         />
         <Route path="/food" element={<Items />} />
         <Route path="*" element={<Login />} />
-      </Routes>
-    </BrowserRouter>
-     </ThemeProvider>
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+
   );
 }
