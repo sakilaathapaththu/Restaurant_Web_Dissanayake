@@ -41,7 +41,7 @@ const FoodCard = ({ food }) => {
             transform: 'translateY(-2px)',
             boxShadow: '0 4px 20px rgba(124, 124, 124, 0.22)',
           },
-          borderRadius: 2,
+          borderRadius: 1,
           overflow: 'hidden',
         }}
       >
