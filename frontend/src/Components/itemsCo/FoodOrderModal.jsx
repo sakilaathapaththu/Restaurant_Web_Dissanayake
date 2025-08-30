@@ -198,7 +198,7 @@ const FoodOrderModal = ({ open, onClose, food, onAddToCart }) => {
           mt: 3,
           p: 2,
           backgroundColor: '#e8d5c4',
-          borderRadius: 2,
+          borderRadius: 1,
           border: '1px solid #2c1000'
         }}>
           <Typography variant="h6" sx={{ color: '#2c1000', textAlign: 'center' }}>
