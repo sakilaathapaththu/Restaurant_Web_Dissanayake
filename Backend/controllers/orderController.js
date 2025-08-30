@@ -1,6 +1,8 @@
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
-const { sendWhatsappText } = require('../services/whatsapp');
+
+const { sendOrderConfirmed } = require('../services/whatsapp');
+
 
 // Create a new order from cart
 const createOrder = async (req, res) => {
@@ -244,7 +246,7 @@ const getOrderById = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { status, estimatedDeliveryTime, pickupTime } = req.body; // 👈 pickupTime added
+    const { status, estimatedDeliveryTime, pickupTime } = req.body; // ⬅️ pickupTime added
 
     if (!status) {
       return res.status(400).json({
@@ -256,14 +258,13 @@ const updateOrderStatus = async (req, res) => {
     // Build the update payload
     const updateData = { status };
     if (estimatedDeliveryTime) updateData.estimatedDeliveryTime = estimatedDeliveryTime;
-    if (pickupTime) updateData.pickupTime = pickupTime; // 👈 persist pickup time
+    if (pickupTime) updateData.pickupTime = pickupTime; // ⬅️ persist pickup time (string like "15:30" or ISO)
 
     // Set actual delivery time if status is delivered
     if (status === 'delivered') {
       updateData.actualDeliveryTime = new Date();
     }
 
-    // Update and get the latest order
     const order = await Order.findByIdAndUpdate(
       orderId,
       updateData,
@@ -277,31 +278,15 @@ const updateOrderStatus = async (req, res) => {
       });
     }
 
-    // 👇 Send WhatsApp only when the order is confirmed
-    if (order.status === 'confirmed' && order.customerPhone) {
-      try {
-        const itemsSummary = (order.items || [])
-          .map(i => `${i.quantity}× ${i.name || i?.foodId?.name || ''}`.trim())
-          .join(', ');
+    // ✅ Send WhatsApp only when the order is confirmed
+try {
+  if (order.status === 'confirmed' && order.customerPhone) {
+    await sendOrderConfirmed(order); // uses your services/whatsapp.js helper
+  }
+} catch (waErr) {
+  console.error('WhatsApp send failed:', waErr); // keep API success even if WA fails
+}
 
-        const msg =
-`✅ ${process.env.BUSINESS_NAME || 'Restaurant'} — Order Confirmed
-
-Hi ${order.customerName || 'Customer'},
-Your order #${String(order._id).slice(-8).toUpperCase()} is confirmed.
-
-Pickup time: ${order.pickupTime || 'N/A'}
-Total: LKR ${Number(order.grandTotal || 0).toLocaleString('en-LK')}
-Items: ${itemsSummary}
-
-Thank you!`;
-
-        await sendWhatsappText(order.customerPhone, msg);
-      } catch (waErr) {
-        // Don't fail the API just because WA failed; log for debugging.
-        console.error('WhatsApp send failed:', waErr);
-      }
-    }
 
     res.status(200).json({
       success: true,
@@ -318,6 +303,7 @@ Thank you!`;
     });
   }
 };
+
 
 
 
