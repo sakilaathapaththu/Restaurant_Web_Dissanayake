@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
+const { sendWhatsappText } = require('../services/whatsapp');
 
 // Create a new order from cart
 const createOrder = async (req, res) => {
@@ -188,56 +189,137 @@ const getOrderById = async (req, res) => {
 };
 
 // Update order status (admin)
+// const updateOrderStatus = async (req, res) => {
+//     try {
+//         const { orderId } = req.params;
+//         const { status, estimatedDeliveryTime } = req.body;
+
+//         if (!status) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Status is required'
+//             });
+//         }
+
+//         const updateData = { status };
+//         if (estimatedDeliveryTime) {
+//             updateData.estimatedDeliveryTime = estimatedDeliveryTime;
+//         }
+
+//         // Set actual delivery time if status is delivered
+//         if (status === 'delivered') {
+//             updateData.actualDeliveryTime = new Date();
+//         }
+
+//         const order = await Order.findByIdAndUpdate(
+//             orderId,
+//             updateData,
+//             { new: true, runValidators: true }
+//         ).populate('items.foodId', 'name image');
+
+//         if (!order) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: 'Order not found'
+//             });
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'Order status updated successfully',
+//             data: order
+//         });
+
+//     } catch (error) {
+//         console.error('Error updating order status:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: 'Internal server error',
+//             error: error.message
+//         });
+//     }
+// };
+
+// Update order status (admin)
 const updateOrderStatus = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { status, estimatedDeliveryTime } = req.body;
+  try {
+    const { orderId } = req.params;
+    const { status, estimatedDeliveryTime, pickupTime } = req.body; // 👈 pickupTime added
 
-        if (!status) {
-            return res.status(400).json({
-                success: false,
-                message: 'Status is required'
-            });
-        }
-
-        const updateData = { status };
-        if (estimatedDeliveryTime) {
-            updateData.estimatedDeliveryTime = estimatedDeliveryTime;
-        }
-
-        // Set actual delivery time if status is delivered
-        if (status === 'delivered') {
-            updateData.actualDeliveryTime = new Date();
-        }
-
-        const order = await Order.findByIdAndUpdate(
-            orderId,
-            updateData,
-            { new: true, runValidators: true }
-        ).populate('items.foodId', 'name image');
-
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Order status updated successfully',
-            data: order
-        });
-
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error.message
-        });
+    if (!status) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status is required'
+      });
     }
+
+    // Build the update payload
+    const updateData = { status };
+    if (estimatedDeliveryTime) updateData.estimatedDeliveryTime = estimatedDeliveryTime;
+    if (pickupTime) updateData.pickupTime = pickupTime; // 👈 persist pickup time
+
+    // Set actual delivery time if status is delivered
+    if (status === 'delivered') {
+      updateData.actualDeliveryTime = new Date();
+    }
+
+    // Update and get the latest order
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('items.foodId', 'name image');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    // 👇 Send WhatsApp only when the order is confirmed
+    if (order.status === 'confirmed' && order.customerPhone) {
+      try {
+        const itemsSummary = (order.items || [])
+          .map(i => `${i.quantity}× ${i.name || i?.foodId?.name || ''}`.trim())
+          .join(', ');
+
+        const msg =
+`✅ ${process.env.BUSINESS_NAME || 'Restaurant'} — Order Confirmed
+
+Hi ${order.customerName || 'Customer'},
+Your order #${String(order._id).slice(-8).toUpperCase()} is confirmed.
+
+Pickup time: ${order.pickupTime || 'N/A'}
+Total: LKR ${Number(order.grandTotal || 0).toLocaleString('en-LK')}
+Items: ${itemsSummary}
+
+Thank you!`;
+
+        await sendWhatsappText(order.customerPhone, msg);
+      } catch (waErr) {
+        // Don't fail the API just because WA failed; log for debugging.
+        console.error('WhatsApp send failed:', waErr);
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Order status updated successfully',
+      data: order
+    });
+
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
 };
+
+
 
 // Cancel order
 // Fixed cancel order function
