@@ -14,18 +14,28 @@ import {
   Select,
   MenuItem,
   Divider,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
+import { useCart } from '../../context/CartContext';
 
-const FoodOrderModal = ({ open, onClose, food }) => {
+const FoodOrderModal = ({ open, onClose, food, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedPortionIndex, setSelectedPortionIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const { addToCart } = useCart();
 
   // Reset selected portion when food changes or modal opens
   useEffect(() => {
     if (open && food) {
       setSelectedPortionIndex(0);
       setQuantity(1);
+      setError('');
+      setSuccess('');
     }
   }, [open, food]);
 
@@ -56,10 +66,79 @@ const FoodOrderModal = ({ open, onClose, food }) => {
   const currentPrice = getCurrentPrice();
   const totalPrice = currentPrice * quantity;
 
+  // Add to cart function
+  const handleAddToCart = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log('FoodOrderModal.handleAddToCart - food object:', food);
+      console.log('FoodOrderModal.handleAddToCart - food._id:', food._id);
+      console.log('FoodOrderModal.handleAddToCart - food.name:', food.name);
+      console.log('FoodOrderModal.handleAddToCart - currentPrice:', currentPrice);
+      
+      // Prepare cart item data
+      const cartItem = {
+        foodId: food._id || food.id, // Use MongoDB ObjectId for proper referencing
+        name: food.name,
+        image: food.image,
+        price: currentPrice,
+        quantity: quantity,
+        selectedPortion: hasMultiplePortions ? {
+          index: selectedPortionIndex,
+          label: getCurrentPortionLabel(),
+          price: currentPrice
+        } : {
+          index: 0,
+          label: "Standard",
+          price: currentPrice
+        }
+      };
+      
+      console.log('FoodOrderModal.handleAddToCart - cartItem:', cartItem);
+
+      // Use the CartContext to add to cart
+      const result = await addToCart(cartItem);
+
+      if (result.success) {
+        setSuccess('Item added to cart successfully!');
+
+        // Call the parent callback if provided
+        if (onAddToCart) {
+          onAddToCart(cartItem, result.data);
+        }
+
+        // Close modal after a brief delay
+        setTimeout(() => {
+          onClose();
+        }, 1500);
+      } else {
+        setError(result.error || 'Failed to add item to cart');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to add item to cart');
+      console.error('Error adding to cart:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{food.name}</DialogTitle>
       <DialogContent>
+        {/* Error/Success Messages */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
+
         <Box sx={{ mb: 2 }}>
           <img
             src={food.image}
@@ -139,6 +218,7 @@ const FoodOrderModal = ({ open, onClose, food }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
           <IconButton
             onClick={handleDecrease}
+            disabled={loading}
             sx={{
               border: '1px solid #ddd',
               '&:hover': { backgroundColor: '#f5f5f5' }
@@ -157,6 +237,7 @@ const FoodOrderModal = ({ open, onClose, food }) => {
           />
           <IconButton
             onClick={handleIncrease}
+            disabled={loading}
             sx={{
               border: '1px solid #ddd',
               '&:hover': { backgroundColor: '#f5f5f5' }
@@ -186,19 +267,32 @@ const FoodOrderModal = ({ open, onClose, food }) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3 }}>
-        <Button onClick={onClose} variant="outlined">
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          disabled={loading}
+        >
           Cancel
         </Button>
         <Button
           variant="contained"
           color="primary"
+          onClick={handleAddToCart}
+          disabled={loading}
           sx={{
             backgroundColor: '#06c167',
             '&:hover': { backgroundColor: '#05a356' },
             minWidth: '120px'
           }}
         >
-          Add to Order
+          {loading ? (
+            <>
+              <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+              Adding...
+            </>
+          ) : (
+            'Add to Cart'
+          )}
         </Button>
       </DialogActions>
     </Dialog>

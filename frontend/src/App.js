@@ -16,7 +16,10 @@ import Foods from "./Pages/ItemePage";
 import Home from "./Pages/homepage";
 import EditItem from "./Pages/admin/items/EditItem";
 import ContactBooking from "./Pages/ContactBooking";
-import InquiriesList from "./Pages/admin/InquiriesList"
+import InquiriesList from "./Pages/admin/InquiriesList";
+import CheckoutPage from "./Pages/CheckoutPage";
+import MyOrdersPage from "./Pages/MyOrdersPage";
+import ViewOrders from "./Pages/admin/orders/ViewOrders";
 
 const theme = createTheme({
   palette: { mode: "light", background: { default: "#F6F9FC" } },
@@ -29,7 +32,7 @@ export default function App() {
       <CssBaseline />
       <BrowserRouter>
         <Routes>
-          
+
           <Route path="*" element={<Login />} />
           <Route path="/login" element={<Login />} />
           {/* Default route - redirect to home */}
@@ -39,6 +42,8 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/contact" element={<ContactBooking />} />
           <Route path="/menu" element={<Foods />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route
             path="/dashboard"
             element={
@@ -108,10 +113,20 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-           <Route path="/inquiries" element={
+          <Route path="/inquiries" element={
             <ProtectedRoute> <RequireRole> <InquiriesList /> </RequireRole> </ProtectedRoute>
           } />
-          
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <RequireRole roles={["superadmin", "editor"]}>
+                  <ViewOrders />
+                </RequireRole>
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
