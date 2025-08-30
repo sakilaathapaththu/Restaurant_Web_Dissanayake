@@ -268,14 +268,6 @@ const MyOrdersPage = () => {
                         >
                           {expandedOrder?._id === order._id ? 'Hide Receipt' : 'View Receipt'}
                         </Button>
-                        <Button 
-                                  onClick={() => handleGenerateInvoice(order)} 
-                                  color="primary" 
-                                  sx={{ mr: 1, backgroundColor: '#06c167', color: 'white',
-                                        '&:hover': { backgroundColor: '#fda021' } }}
-                                >
-                                  Generate Invoice
-                                </Button>
 
                         {['pending'].includes(order.status) && (
                           <Button
