@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import orderService from '../services/orderService';
 import cartService from '../services/cartService';
 import Homepagenavbar from '../Components/Navbar/Homepagenavbar';
+import jsPDF from 'jspdf';
 
 const MyOrdersPage = () => {
   const navigate = useNavigate();
@@ -84,6 +85,16 @@ const MyOrdersPage = () => {
     setExpandedOrder(expandedOrder?._id === order._id ? null : order);
   };
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'warning';
@@ -108,14 +119,86 @@ const MyOrdersPage = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+  const handleGenerateInvoice = (order) => {
+    const doc = new jsPDF();
+
+    // Header (Restaurant Branding)
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("🍴 Delicious Restaurant", 105, 20, { align: "center" });
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text("123 Food Street, Colombo, Sri Lanka", 105, 28, { align: "center" });
+    doc.text("Tel: +94 77 123 4567", 105, 34, { align: "center" });
+
+    // Invoice title
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("INVOICE", 105, 50, { align: "center" });
+
+    // Order info
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Order ID: #${order._id.slice(-8).toUpperCase()}`, 20, 70);
+    doc.text(`Date: ${formatDate(order.createdAt)}`, 20, 78);
+    doc.text(`Payment: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, 86);
+
+    // Customer info
+    doc.text(`Customer: ${order.customerName}`, 120, 70);
+    doc.text(`Phone: ${order.customerPhone}`, 120, 78);
+    if (order.orderType === "delivery" && order.address) {
+      doc.text(`Address: ${order.address}`, 120, 86);
+    }
+
+    // Table Header
+    let startY = 105;
+    doc.setFont("helvetica", "bold");
+    doc.text("Item", 20, startY);
+    doc.text("Qty", 100, startY);
+    doc.text("Price", 130, startY);
+    doc.text("Total", 170, startY);
+
+    doc.line(20, startY + 2, 190, startY + 2); // underline header
+    startY += 10;
+
+    // Table Rows
+    doc.setFont("helvetica", "normal");
+    order.items.forEach((item) => {
+      doc.text(item.name, 20, startY);
+      doc.text(`${item.quantity}`, 105, startY, { align: "center" });
+      doc.text(`LKR ${item.price.toLocaleString()}`, 130, startY, { align: "right" });
+      doc.text(`LKR ${item.totalPrice.toLocaleString()}`, 190, startY, { align: "right" });
+      startY += 8;
     });
+
+    doc.line(20, startY, 190, startY);
+
+    // Summary
+    startY += 10;
+    doc.text(`Items Total:`, 130, startY);
+    doc.text(`LKR ${order.totalAmount.toLocaleString()}`, 190, startY, { align: "right" });
+
+    if (order.serviceCharge) {
+      startY += 8;
+      doc.text(`Service Charge:`, 130, startY);
+      doc.text(`LKR ${order.serviceCharge.toLocaleString()}`, 190, startY, { align: "right" });
+    }
+
+    startY += 10;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Grand Total:`, 130, startY);
+    doc.text(`LKR ${order.grandTotal.toLocaleString()}`, 190, startY, { align: "right" });
+
+    // Footer
+    startY += 20;
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(11);
+    doc.text("Thank you for dining with Delicious Restaurant!", 105, startY, { align: "center" });
+    doc.text("Visit us again 🍽️", 105, startY + 8, { align: "center" });
+
+    // Save PDF
+    doc.save(`Invoice_${order._id}.pdf`);
   };
 
   if (loading && orders.length === 0) {
@@ -185,6 +268,14 @@ const MyOrdersPage = () => {
                         >
                           {expandedOrder?._id === order._id ? 'Hide Receipt' : 'View Receipt'}
                         </Button>
+                        <Button 
+                                  onClick={() => handleGenerateInvoice(order)} 
+                                  color="primary" 
+                                  sx={{ mr: 1, backgroundColor: '#06c167', color: 'white',
+                                        '&:hover': { backgroundColor: '#fda021' } }}
+                                >
+                                  Generate Invoice
+                                </Button>
 
                         {['pending'].includes(order.status) && (
                           <Button
@@ -290,9 +381,14 @@ const MyOrdersPage = () => {
                             </Grid>
 
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                              {['pending'].includes(order.status) && (
-                                <Button onClick={() => handleCancelOrder(order)} color="error" disabled={cancellingOrder === order._id} sx={{ mr: 1 }}>
-                                  {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel Order'}
+                              {order.status === 'confirmed' && (
+                                <Button 
+                                  onClick={() => handleGenerateInvoice(order)} 
+                                  color="primary" 
+                                  sx={{ mr: 1, backgroundColor: '#06c167', color: 'white',
+                                        '&:hover': { backgroundColor: '#fda021' } }}
+                                >
+                                  Generate Invoice
                                 </Button>
                               )}
                               <Button onClick={() => setExpandedOrder(null)}>Close</Button>
