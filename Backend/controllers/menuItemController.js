@@ -299,7 +299,7 @@ exports.createMenuItem = async (req, res, next) => {
   try {
     let {
       menuId, categoryId, categoryName,
-      name, description, portions, isActive, itemStatus, order,
+      name, description, portions, isActive, isPopular, itemStatus, order,
       imageBase64, imageMime // optional (imageMime ignored if data URI provided)
     } = req.body;
 
@@ -348,6 +348,7 @@ exports.createMenuItem = async (req, res, next) => {
       description,
       portions: cleanedPortions,
       isActive: isActive !== undefined ? !!isActive : true,
+      isPopular: isPopular !== undefined ? !!isPopular : false,
       itemStatus: itemStatus || "available",
       order: typeof order === "number" ? order : 0,
       image // may be {}
@@ -355,6 +356,12 @@ exports.createMenuItem = async (req, res, next) => {
 
     const data = doc.toObject();
     data.portions = data.portions.map(p => ({ ...p, finalPrice: computeFinalPrice(p) }));
+
+    // Ensure popular field is always present
+    if (data.isPopular === undefined) {
+      data.isPopular = false;
+    }
+
     // We do NOT include raw base64 image in list responses by default.
     res.status(201).json({ success: true, data });
   } catch (err) {
@@ -387,11 +394,19 @@ exports.getMenuItems = async (req, res, next) => {
     const data = items.map(i => {
       const obj = i.toObject();
       obj.portions = obj.portions.map(p => ({ ...p, finalPrice: computeFinalPrice(p) }));
-      // Do not ship base64 in list to keep payload small
-      if (obj.image) {
-        obj.hasImage = !!obj.image?.data;
-        delete obj.image;
+      // Include image data for frontend display
+      if (obj.image && obj.image.data && obj.image.mime) {
+        obj.imageDataUri = `data:${obj.image.mime};base64,${obj.image.data}`;
+        obj.hasImage = true;
+      } else {
+        obj.hasImage = false;
       }
+      // Ensure popular field is always present
+      if (obj.isPopular === undefined) {
+        obj.isPopular = false;
+      }
+      // Remove raw image data to keep payload clean
+      delete obj.image;
       return obj;
     });
 
@@ -423,6 +438,11 @@ exports.getMenuItem = async (req, res, next) => {
       delete data.image;
     }
 
+    // Ensure popular field is always present
+    if (data.isPopular === undefined) {
+      data.isPopular = false;
+    }
+
     res.json({ success: true, data });
   } catch (err) {
     next(err);
@@ -436,7 +456,7 @@ exports.updateMenuItem = async (req, res, next) => {
     const { id } = req.params;
 
     const payload = {};
-    const allowed = ["name", "description", "portions", "isActive", "itemStatus", "order", "categoryId", "categoryName"];
+    const allowed = ["name", "description", "portions", "isActive", "isPopular", "itemStatus", "order", "categoryId", "categoryName"];
     for (const k of allowed) if (req.body[k] !== undefined) payload[k] = req.body[k];
 
     // Optional: imageBase64 (replace image)
@@ -482,6 +502,12 @@ exports.updateMenuItem = async (req, res, next) => {
       data.hasImage = !!data.image?.data;
       delete data.image;
     }
+
+    // Ensure popular field is always present
+    if (data.isPopular === undefined) {
+      data.isPopular = false;
+    }
+
     res.json({ success: true, data });
   } catch (err) {
     if (err?.message?.includes("Only JPEG") || err?.message?.includes("base64") || err?.message?.includes("too large")) {
@@ -510,6 +536,12 @@ exports.toggleMenuItem = async (req, res, next) => {
       data.hasImage = !!data.image?.data;
       delete data.image;
     }
+
+    // Ensure popular field is always present
+    if (data.isPopular === undefined) {
+      data.isPopular = false;
+    }
+
     res.json({ success: true, data });
   } catch (err) {
     next(err);
