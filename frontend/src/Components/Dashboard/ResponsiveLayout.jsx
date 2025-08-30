@@ -11,7 +11,6 @@ import {
   InsertDriveFile as FileIcon,
   Mail as MailIcon,
   BarChart as ChartIcon,
-  Campaign as CampaignIcon,
   Work as WorkIcon
 } from "@mui/icons-material";
 import { Link, useLocation } from "react-router-dom";
@@ -20,17 +19,16 @@ const drawerWidth = 260;
 
 const navItems = [
   { label: "Dashboard", icon: <DashboardIcon />, to: "/dashboard" },
-  { label: "Promotions", icon: <CampaignIcon />, to: "/promotions" },
-  { label: "Careers", icon: <WorkIcon />, to: "/careers" },
-  { label: "Posts", icon: <ArticleIcon />, to: "/posts" },
+  { label: "Orders", icon: <ArticleIcon />, to: "/orders" },
+  { label: "Menu Items", icon: <FileIcon />, to: "/items" },
+  { label: "Categories", icon: <ChartIcon />, to: "/categories" },
   { label: "Inquiries", icon: <MailIcon />, to: "/inquiries" },
-  { label: "Downloads", icon: <FileIcon />, to: "/downloads" },
-  { label: "Interest Rates", icon: <ChartIcon />, to: "/rates" },
+  { label: "Add Admin", icon: <WorkIcon />, to: "/admins/create", roles: ["superadmin"] },
 ];
 
 export default function ResponsiveLayout({
   children,
-  title = "The Web Site Content Management System (CMS)"
+  title = "Dissanayaka Restaurant Admin Dashboard"
 }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
@@ -71,31 +69,33 @@ export default function ResponsiveLayout({
       </Box>
       <Divider />
       <List sx={{ p: 1, flex: 1 }}>
-        {navItems.map((item) => (
-          <ListItemButton
-            key={item.to}
-            component={Link}
-            to={item.to}
-            onClick={handleNavClick}
-            selected={isActive(item.to)}
-            sx={{
-              mb: 0.5,
-              borderRadius: 2,
-              "&.Mui-selected": {
-                bgcolor: "action.selected",
-                "& .MuiListItemIcon-root": { color: "primary.main" },
-              },
-            }}
-          >
-            <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
+        {navItems
+          .filter(item => !item.roles || item.roles.includes(role))
+          .map((item) => (
+            <ListItemButton
+              key={item.to}
+              component={Link}
+              to={item.to}
+              onClick={handleNavClick}
+              selected={isActive(item.to)}
+              sx={{
+                mb: 0.5,
+                borderRadius: 2,
+                "&.Mui-selected": {
+                  bgcolor: "action.selected",
+                  "& .MuiListItemIcon-root": { color: "primary.main" },
+                },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          ))}
       </List>
       <Divider />
       <Box sx={{ p: 2 }}>
         <Typography variant="caption" color="text.secondary">
-          Dissanayaka admin | Powered by Blackcodedevs
+          Dissanayaka Restaurant Admin | Powered by Blackcodedevs
         </Typography>
       </Box>
     </Box>

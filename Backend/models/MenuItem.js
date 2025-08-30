@@ -85,6 +85,7 @@ const MenuItemSchema = new mongoose.Schema(
       default: "available",
     },
     order: { type: Number, default: 0 },                                 // optional for sorting
+    isPopular: { type: Boolean, default: false },
 
     // 🔥 NEW: embedded image (base64)
     image: { type: ImageSchema, default: () => ({}) },

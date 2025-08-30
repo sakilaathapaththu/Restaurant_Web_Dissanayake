@@ -10,8 +10,7 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 
-const SearchBar = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+const SearchBar = ({ searchTerm = '', onSearchChange }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const popularSearches = [
@@ -20,7 +19,21 @@ const SearchBar = () => {
   ];
 
   const handleClear = () => {
-    setSearchTerm('');
+    if (onSearchChange) {
+      onSearchChange('');
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    if (onSearchChange) {
+      onSearchChange(e.target.value);
+    }
+  };
+
+  const handlePopularSearchClick = (search) => {
+    if (onSearchChange) {
+      onSearchChange(search);
+    }
   };
 
   return (
@@ -29,7 +42,7 @@ const SearchBar = () => {
         fullWidth
         placeholder="Search foods and food"
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleSearchChange}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setTimeout(() => setIsFocused(false), 200)}
         InputProps={{
@@ -87,6 +100,7 @@ const SearchBar = () => {
                 variant="outlined"
                 size="small"
                 clickable
+                onClick={() => handlePopularSearchClick(search)}
                 sx={{
                   borderRadius: '16px',
                   '&:hover': {

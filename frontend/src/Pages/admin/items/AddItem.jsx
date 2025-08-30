@@ -540,6 +540,7 @@ export default function AddItem() {
 
   const [itemStatus, setItemStatus] = useState("available"); // "available" | "out_of_stock" | "unavailable"
   const [isActive, setIsActive] = useState(true);
+  const [isPopular, setIsPopular] = useState(false);
 
   const [portions, setPortions] = useState([
     { label: "", price: "", discount: { active: false, type: "percent", value: 0 } },
@@ -698,6 +699,7 @@ export default function AddItem() {
         description: description?.trim(),
         order: Number(order) || 0,
         isActive,
+        isPopular,
         itemStatus,
         portions: portions
           .map((p) => ({
@@ -904,6 +906,12 @@ export default function AddItem() {
                   <FormControlLabel
                     control={<Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />}
                     label="Active"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} sx={{ display: "flex", alignItems: "center" }}>
+                  <FormControlLabel
+                    control={<Switch checked={isPopular} onChange={(e) => setIsPopular(e.target.checked)} />}
+                    label="Popular Item"
                   />
                 </Grid>
               </Grid>
