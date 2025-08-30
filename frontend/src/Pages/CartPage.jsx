@@ -289,7 +289,7 @@ const CartPage = () => {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography variant="body2">Delivery Fee</Typography>
                                     <Typography variant="body2">LKR 200</Typography>
                                 </Box>
@@ -297,7 +297,7 @@ const CartPage = () => {
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                                     <Typography variant="body2">Service Charge</Typography>
                                     <Typography variant="body2">LKR 50</Typography>
-                                </Box>
+                                </Box> */}
                             </Box>
 
                             <Divider sx={{ mb: 2 }} />
@@ -307,7 +307,7 @@ const CartPage = () => {
                                     Total
                                 </Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#06c167' }}>
-                                    LKR {(totalAmount + 250).toLocaleString()}
+                                    LKR {(totalAmount).toLocaleString()}
                                 </Typography>
                             </Box>
 
