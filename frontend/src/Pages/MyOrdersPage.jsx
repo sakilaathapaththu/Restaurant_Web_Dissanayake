@@ -18,7 +18,6 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    IconButton
 } from '@mui/material';
 import {
     Visibility,
@@ -59,9 +58,9 @@ const MyOrdersPage = () => {
             const response = await orderService.getOrdersByUser(guestUserId, { page, limit: 10 });
 
             if (response.success) {
-                // Filter out cancelled and delivered orders
+                // Include confirmed orders
                 const filteredOrders = response.data.filter(order =>
-                    !['cancelled', 'confirmed'].includes(order.status)
+                    !['cancelled'].includes(order.status)
                 );
                 setOrders(filteredOrders);
                 setTotalPages(response.pagination.totalPages);
@@ -80,19 +79,14 @@ const MyOrdersPage = () => {
     };
 
     const handleCancelOrder = async (order) => {
-        if (!window.confirm('Are you sure you want to cancel this order?')) {
-            return;
-        }
+        if (!window.confirm('Are you sure you want to cancel this order?')) return;
 
         try {
             setCancellingOrder(order._id);
             const guestUserId = cartService.generateGuestUserId();
             await orderService.cancelOrder(order._id, guestUserId);
-
-            // Reload orders
             await loadOrders();
 
-            // Close dialog if open
             if (selectedOrder?._id === order._id) {
                 setDialogOpen(false);
                 setSelectedOrder(null);
@@ -187,32 +181,17 @@ const MyOrdersPage = () => {
                     </Paper>
                 ) : (
                     <>
-                        {/* Orders Grid - Maximum 3 per row with centered content */}
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            width: '100%'
-                        }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                             <Grid
                                 container
                                 spacing={3}
                                 sx={{
-                                    maxWidth: '1200px', // Limit max width for better centering
+                                    maxWidth: '1200px',
                                     justifyContent: orders.length < 3 ? 'center' : 'flex-start'
                                 }}
                             >
                                 {orders.map((order) => (
-                                    <Grid
-                                        item
-                                        xs={12}
-                                        sm={6}
-                                        md={4}
-                                        key={order._id}
-                                        sx={{
-                                            display: 'flex',
-                                            justifyContent: 'center'
-                                        }}
-                                    >
+                                    <Grid item xs={12} sm={6} md={4} key={order._id} sx={{ display: 'flex', justifyContent: 'center' }}>
                                         <Card
                                             sx={{
                                                 height: '100%',
@@ -220,32 +199,14 @@ const MyOrdersPage = () => {
                                                 flexDirection: 'column',
                                                 minHeight: 450,
                                                 width: '100%',
-                                                maxWidth: 350, // Fixed max width for consistency
+                                                maxWidth: 350,
                                                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                                                 transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                                                '&:hover': {
-                                                    transform: 'translateY(-4px)',
-                                                    boxShadow: '0 8px 20px rgba(0,0,0,0.15)'
-                                                }
+                                                '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 20px rgba(0,0,0,0.15)' }
                                             }}
                                         >
-                                            <CardContent
-                                                sx={{
-                                                    p: 3,
-                                                    flexGrow: 1,
-                                                    display: 'flex',
-                                                    flexDirection: 'column'
-                                                }}
-                                            >
-                                                {/* Order Header */}
-                                                <Box sx={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'flex-start',
-                                                    mb: 2,
-                                                    flexDirection: 'column',
-                                                    gap: 1
-                                                }}>
+                                            <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2, flexDirection: 'column', gap: 1 }}>
                                                     <Box sx={{ width: '100%' }}>
                                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, fontSize: '1.1rem' }}>
                                                             Order #{order._id.slice(-8).toUpperCase()}
@@ -265,73 +226,31 @@ const MyOrdersPage = () => {
                                                     </Box>
                                                 </Box>
 
-                                                {/* Order Details */}
                                                 <Box sx={{ mb: 2, flexGrow: 1 }}>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                                        Customer: {order.customerName}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                                        Phone: {order.customerPhone}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                                        Type: {order.orderType.charAt(0).toUpperCase() + order.orderType.slice(1)}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                                        Items: {order.items.length}
-                                                    </Typography>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                                        Payment: {order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}
-                                                    </Typography>
-                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#06c167', mt: 1 }}>
-                                                        Total: LKR {order.grandTotal.toLocaleString()}
-                                                    </Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Customer: {order.customerName}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Phone: {order.customerPhone}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Type: {order.orderType.charAt(0).toUpperCase() + order.orderType.slice(1)}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Items: {order.items.length}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Payment: {order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</Typography>
+                                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#06c167', mt: 1 }}>Total: LKR {order.grandTotal.toLocaleString()}</Typography>
                                                 </Box>
 
-                                                {/* Order Items Preview */}
                                                 <Box sx={{ mb: 2 }}>
-                                                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                                                        Items:
-                                                    </Typography>
+                                                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>Items:</Typography>
                                                     <Grid container spacing={1}>
                                                         {order.items.slice(0, 3).map((item, index) => (
                                                             <Grid item xs={4} key={index}>
-                                                                <Box sx={{
-                                                                    display: 'flex',
-                                                                    flexDirection: 'column',
-                                                                    alignItems: 'center',
-                                                                    textAlign: 'center',
-                                                                    height: '100px'
-                                                                }}>
+                                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', height: '100px' }}>
                                                                     <CardMedia
                                                                         component="img"
                                                                         image={item.image || '/placeholder-food.jpg'}
                                                                         alt={item.name}
-                                                                        sx={{
-                                                                            width: 50,
-                                                                            height: 50,
-                                                                            objectFit: 'cover',
-                                                                            borderRadius: 1,
-                                                                            mb: 1
-                                                                        }}
+                                                                        sx={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 1, mb: 1 }}
                                                                     />
-                                                                    <Typography
-                                                                        variant="caption"
-                                                                        sx={{
-                                                                            fontWeight: 'bold',
-                                                                            fontSize: '0.7rem',
-                                                                            lineHeight: 1.2,
-                                                                            overflow: 'hidden',
-                                                                            textOverflow: 'ellipsis',
-                                                                            display: '-webkit-box',
-                                                                            WebkitLineClamp: 2,
-                                                                            WebkitBoxOrient: 'vertical'
-                                                                        }}
-                                                                    >
+                                                                    <Typography variant="caption" sx={{ fontWeight: 'bold', fontSize: '0.7rem', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                                                                         {item.name}
                                                                     </Typography>
-                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>
-                                                                        Qty: {item.quantity}
-                                                                    </Typography>
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.6rem' }}>Qty: {item.quantity}</Typography>
                                                                 </Box>
                                                             </Grid>
                                                         ))}
@@ -347,13 +266,7 @@ const MyOrdersPage = () => {
 
                                                 <Divider sx={{ my: 2 }} />
 
-                                                {/* Action Buttons */}
-                                                <Box sx={{
-                                                    display: 'flex',
-                                                    gap: 1,
-                                                    justifyContent: 'center',
-                                                    flexDirection: 'column'
-                                                }}>
+                                                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', flexDirection: 'column' }}>
                                                     <Button
                                                         variant="outlined"
                                                         startIcon={<Visibility />}
@@ -362,9 +275,9 @@ const MyOrdersPage = () => {
                                                         size="small"
                                                         sx={{ mb: 1 }}
                                                     >
-                                                        View Details
+                                                        {order.status === 'confirmed' ? 'View Receipt' : 'View Details'}
                                                     </Button>
-                                                    {['pending', 'confirmed'].includes(order.status) && (
+                                                    {['pending'].includes(order.status) && (
                                                         <Button
                                                             variant="outlined"
                                                             color="error"
@@ -385,7 +298,6 @@ const MyOrdersPage = () => {
                             </Grid>
                         </Box>
 
-                        {/* Pagination */}
                         {totalPages > 1 && (
                             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                                 <Pagination
@@ -400,20 +312,12 @@ const MyOrdersPage = () => {
                     </>
                 )}
 
-                {/* Order Details Dialog */}
-                <Dialog
-                    open={dialogOpen}
-                    onClose={() => setDialogOpen(false)}
-                    maxWidth="md"
-                    fullWidth
-                >
+                <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
                     {selectedOrder && (
                         <>
                             <DialogTitle>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant="h6">
-                                        Order #{selectedOrder._id.slice(-8).toUpperCase()}
-                                    </Typography>
+                                    <Typography variant="h6">Order #{selectedOrder._id.slice(-8).toUpperCase()}</Typography>
                                     <Chip
                                         icon={getStatusIcon(selectedOrder.status)}
                                         label={selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1)}
@@ -422,48 +326,27 @@ const MyOrdersPage = () => {
                                 </Box>
                             </DialogTitle>
                             <DialogContent>
+                                {selectedOrder.status === 'confirmed' && (
+                                    <Alert severity="success" sx={{ mb: 2 }}>Your order has been confirmed by admin!</Alert>
+                                )}
                                 <Grid container spacing={3}>
                                     <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            Order Information
-                                        </Typography>
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Order Date: {formatDate(selectedOrder.createdAt)}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Order Type: {selectedOrder.orderType.charAt(0).toUpperCase() + selectedOrder.orderType.slice(1)}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Payment Method: {selectedOrder.paymentMethod.charAt(0).toUpperCase() + selectedOrder.paymentMethod.slice(1)}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Payment Status: {selectedOrder.paymentStatus.charAt(0).toUpperCase() + selectedOrder.paymentStatus.slice(1)}
-                                            </Typography>
-                                        </Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>Order Information</Typography>
+                                        <Typography variant="body2" color="text.secondary">Order Date: {formatDate(selectedOrder.createdAt)}</Typography>
+                                        <Typography variant="body2" color="text.secondary">Order Type: {selectedOrder.orderType.charAt(0).toUpperCase() + selectedOrder.orderType.slice(1)}</Typography>
+                                        <Typography variant="body2" color="text.secondary">Payment Method: {selectedOrder.paymentMethod.charAt(0).toUpperCase() + selectedOrder.paymentMethod.slice(1)}</Typography>
+                                        <Typography variant="body2" color="text.secondary">Payment Status: {selectedOrder.paymentStatus.charAt(0).toUpperCase() + selectedOrder.paymentStatus.slice(1)}</Typography>
 
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            Customer Details
-                                        </Typography>
-                                        <Box sx={{ mb: 2 }}>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Name: {selectedOrder.customerName}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                Phone: {selectedOrder.customerPhone}
-                                            </Typography>
-                                            {selectedOrder.orderType === 'delivery' && selectedOrder.address && (
-                                                <Typography variant="body2" color="text.secondary">
-                                                    Address: {selectedOrder.address}
-                                                </Typography>
-                                            )}
-                                        </Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mt: 2 }}>Customer Details</Typography>
+                                        <Typography variant="body2" color="text.secondary">Name: {selectedOrder.customerName}</Typography>
+                                        <Typography variant="body2" color="text.secondary">Phone: {selectedOrder.customerPhone}</Typography>
+                                        {selectedOrder.orderType === 'delivery' && selectedOrder.address && (
+                                            <Typography variant="body2" color="text.secondary">Address: {selectedOrder.address}</Typography>
+                                        )}
                                     </Grid>
 
                                     <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>
-                                            Order Items
-                                        </Typography>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 2 }}>Order Items</Typography>
                                         <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
                                             {selectedOrder.items.map((item, index) => (
                                                 <Card key={index} sx={{ mb: 2 }}>
@@ -474,31 +357,16 @@ const MyOrdersPage = () => {
                                                                     component="img"
                                                                     image={item.image || '/placeholder-food.jpg'}
                                                                     alt={item.name}
-                                                                    sx={{
-                                                                        width: '100%',
-                                                                        height: 60,
-                                                                        objectFit: 'cover',
-                                                                        borderRadius: 1
-                                                                    }}
+                                                                    sx={{ width: '100%', height: 60, objectFit: 'cover', borderRadius: 1 }}
                                                                 />
                                                             </Grid>
                                                             <Grid item xs={8}>
-                                                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                                    {item.name}
-                                                                </Typography>
-                                                                {item.selectedPortion.label !== 'Standard' && (
-                                                                    <Chip
-                                                                        label={item.selectedPortion.label}
-                                                                        size="small"
-                                                                        sx={{ mb: 1, backgroundColor: '#f0f0f0' }}
-                                                                    />
+                                                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>{item.name}</Typography>
+                                                                {item.selectedPortion?.label !== 'Standard' && (
+                                                                    <Chip label={item.selectedPortion.label} size="small" sx={{ mb: 1, backgroundColor: '#f0f0f0' }} />
                                                                 )}
-                                                                <Typography variant="body2" color="text.secondary">
-                                                                    Qty: {item.quantity} × LKR {item.price.toLocaleString()}
-                                                                </Typography>
-                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#06c167' }}>
-                                                                    LKR {item.totalPrice.toLocaleString()}
-                                                                </Typography>
+                                                                <Typography variant="body2" color="text.secondary">Qty: {item.quantity} × LKR {item.price.toLocaleString()}</Typography>
+                                                                <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#06c167' }}>LKR {item.totalPrice.toLocaleString()}</Typography>
                                                             </Grid>
                                                         </Grid>
                                                     </CardContent>
@@ -523,24 +391,16 @@ const MyOrdersPage = () => {
                                             </Box>
                                             <Divider sx={{ my: 1 }} />
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                                    Grand Total
-                                                </Typography>
-                                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#06c167' }}>
-                                                    LKR {selectedOrder.grandTotal.toLocaleString()}
-                                                </Typography>
+                                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Grand Total</Typography>
+                                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#06c167' }}>LKR {selectedOrder.grandTotal.toLocaleString()}</Typography>
                                             </Box>
                                         </Box>
                                     </Grid>
                                 </Grid>
                             </DialogContent>
                             <DialogActions>
-                                {['pending', 'confirmed'].includes(selectedOrder.status) && (
-                                    <Button
-                                        onClick={() => handleCancelOrder(selectedOrder)}
-                                        color="error"
-                                        disabled={cancellingOrder === selectedOrder._id}
-                                    >
+                                {['pending'].includes(selectedOrder.status) && (
+                                    <Button onClick={() => handleCancelOrder(selectedOrder)} color="error" disabled={cancellingOrder === selectedOrder._id}>
                                         {cancellingOrder === selectedOrder._id ? 'Cancelling...' : 'Cancel Order'}
                                     </Button>
                                 )}

@@ -15,32 +15,23 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
 
   const popularSearches = [
     'Pizza', 'Burgers', 'Sushi', 'Thai Food', 'Chinese', 'Ice Cream',
-    'Coffee', 'Healthy', 'Fast Food', 'Desserts'
+    'Coffee', 'Healthy', 'Fast Food', 'Desserts', 'Salad', 'Fried Rice',
+    'Chicken', 'Beef', 'Fish', 'Biryani', 'Pasta'
   ];
 
-  const handleClear = () => {
-    if (onSearchChange) {
-      onSearchChange('');
-    }
-  };
+  const handleClear = () => onSearchChange?.('');
+  const handleSearchChange = (e) => onSearchChange?.(e.target.value);
+  const handlePopularSearchClick = (search) => onSearchChange?.(search);
 
-  const handleSearchChange = (e) => {
-    if (onSearchChange) {
-      onSearchChange(e.target.value);
-    }
-  };
-
-  const handlePopularSearchClick = (search) => {
-    if (onSearchChange) {
-      onSearchChange(search);
-    }
-  };
+  const filteredPopularSearches = popularSearches.filter(item =>
+    item.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <Box sx={{ px: 2, py: 2, backgroundColor: 'white' }}>
+    <Box sx={{ px: 2, py: 2, backgroundColor: 'Seashell White', position: 'relative' }}>
       <TextField
         fullWidth
-        placeholder="Search foods and food"
+        placeholder="Search foods and categories"
         value={searchTerm}
         onChange={handleSearchChange}
         onFocus={() => setIsFocused(true)}
@@ -60,22 +51,15 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
           ),
           sx: {
             borderRadius: '8px',
-            backgroundColor: '#f6f6f6',
-            '& .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              border: '1px solid #ddd',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              border: '2px solid #06c167',
-            },
+            backgroundColor: '#ffffffff',
+            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+            '&:hover .MuiOutlinedInput-notchedOutline': { border: '1px solid #ddd' },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: '2px solid #fda021' },
           },
         }}
       />
 
-      {/* Popular Searches */}
-      {(isFocused || searchTerm) && (
+      {(isFocused || searchTerm) && filteredPopularSearches.length > 0 && (
         <Paper
           elevation={3}
           sx={{
@@ -93,7 +77,7 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
             Popular searches
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {popularSearches.map((search) => (
+            {filteredPopularSearches.map((search) => (
               <Chip
                 key={search}
                 label={search}
@@ -101,12 +85,7 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
                 size="small"
                 clickable
                 onClick={() => handlePopularSearchClick(search)}
-                sx={{
-                  borderRadius: '16px',
-                  '&:hover': {
-                    backgroundColor: '#f0f0f0',
-                  },
-                }}
+                sx={{ borderRadius: '16px', '&:hover': { backgroundColor: '#f0f0f0' } }}
               />
             ))}
           </Box>
