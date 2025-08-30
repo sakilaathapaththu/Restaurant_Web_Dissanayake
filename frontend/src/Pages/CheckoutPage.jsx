@@ -101,9 +101,9 @@ const CheckoutPage = () => {
         }
     };
 
-    // const deliveryFee = 200;
-    // const serviceCharge = 50;
-    const grandTotal = totalAmount ;
+    const deliveryFee = 0;
+    const serviceCharge = 0;
+    const grandTotal = totalAmount + deliveryFee + serviceCharge;
 
     if (items.length === 0) {
         return null; // Will redirect

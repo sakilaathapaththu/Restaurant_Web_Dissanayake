@@ -47,12 +47,10 @@ const OrderSchema = new mongoose.Schema({
         required: true
     },
     deliveryFee: {
-        type: Number,
-        default: 200
-    },
+        type: Number },
     serviceCharge: {
-        type: Number,
-        default: 50
+        type: Number
+        
     },
     grandTotal: {
         type: Number,
@@ -66,7 +64,7 @@ const OrderSchema = new mongoose.Schema({
     orderType: {
         type: String,
         enum: ['delivery', 'pickup'],
-        default: 'delivery'
+        default: 'pickup'
     },
     // Simplified address field - single text field
     address: {
