@@ -21,19 +21,17 @@ import {
   KeyboardArrowDown,
 } from '@mui/icons-material';
 
-const Filters = () => {
+const Filters = ({
+  filters = {},
+  onFilterChange,
+  priceRange = [0, 100],
+  onPriceRangeChange,
+  minRating = 4,
+  onRatingChange,
+  onDietaryChange,
+  dietaryFilter = ''
+}) => {
   const [anchorEl, setAnchorEl] = useState({});
-  const [filters, setFilters] = useState({
-    offers: false,
-    deliveryFee: false,
-    under30min: false,
-    rating: false,
-    price: false,
-    dietary: false,
-    sort: 'recommended',
-  });
-  const [priceRange, setPriceRange] = useState([0, 50]);
-  const [minRating, setMinRating] = useState(4);
 
   const handleClick = (event, filterType) => {
     setAnchorEl({ ...anchorEl, [filterType]: event.currentTarget });
@@ -42,6 +40,43 @@ const Filters = () => {
   const handleClose = (filterType) => {
     setAnchorEl({ ...anchorEl, [filterType]: null });
   };
+
+  const toggleFilter = (filterKey) => {
+    if (onFilterChange) {
+      const newFilters = { ...filters, [filterKey]: !filters[filterKey] };
+      onFilterChange(newFilters);
+    }
+  };
+
+  const handleSortChange = (sortValue) => {
+    if (onFilterChange) {
+      const newFilters = { ...filters, sort: sortValue };
+      onFilterChange(newFilters);
+    }
+    handleClose('sort');
+  };
+
+  const handlePriceRangeChange = (event, newValue) => {
+    if (onPriceRangeChange) {
+      onPriceRangeChange(newValue);
+    }
+  };
+
+  const handleRatingChange = (event, newValue) => {
+    if (onRatingChange) {
+      onRatingChange(newValue);
+    }
+  };
+
+  const handleDietaryChange = (dietary) => {
+    if (onDietaryChange) {
+      onDietaryChange(dietary);
+    }
+    handleClose('dietary');
+  };
+
+  // Check if dietary filter is active
+  const isDietaryActive = !!dietaryFilter;
 
   const filterChips = [
     {
@@ -78,7 +113,7 @@ const Filters = () => {
       key: 'dietary',
       label: 'Dietary',
       icon: null,
-      active: filters.dietary,
+      active: isDietaryActive,
     },
     {
       key: 'sort',
@@ -87,10 +122,6 @@ const Filters = () => {
       active: false,
     },
   ];
-
-  const toggleFilter = (filterKey) => {
-    setFilters({ ...filters, [filterKey]: !filters[filterKey] });
-  };
 
   return (
     <Box sx={{ px: 2, py: 1, backgroundColor: 'white', borderBottom: '1px solid #eee' }}>
@@ -126,7 +157,7 @@ const Filters = () => {
       >
         <MenuItem onClick={() => { toggleFilter('offers'); handleClose('offers'); }}>
           <FormControlLabel
-            control={<Switch checked={filters.offers} />}
+            control={<Switch checked={filters.offers || false} />}
             label="Show offers only"
           />
         </MenuItem>
@@ -144,7 +175,7 @@ const Filters = () => {
           <FormControlLabel
             control={
               <Switch
-                checked={filters.deliveryFee}
+                checked={filters.deliveryFee || false}
                 onChange={() => toggleFilter('deliveryFee')}
               />
             }
@@ -161,7 +192,7 @@ const Filters = () => {
       >
         <MenuItem onClick={() => { toggleFilter('under30min'); handleClose('under30min'); }}>
           <FormControlLabel
-            control={<Switch checked={filters.under30min} />}
+            control={<Switch checked={filters.under30min || false} />}
             label="Under 30 minutes"
           />
         </MenuItem>
@@ -178,7 +209,7 @@ const Filters = () => {
           <Typography variant="subtitle1" sx={{ mb: 2 }}>Minimum rating</Typography>
           <Rating
             value={minRating}
-            onChange={(event, newValue) => setMinRating(newValue)}
+            onChange={handleRatingChange}
             precision={0.5}
           />
           <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
@@ -198,7 +229,7 @@ const Filters = () => {
           <Typography variant="subtitle1" sx={{ mb: 2 }}>Price range (LKR)</Typography>
           <Slider
             value={priceRange}
-            onChange={(event, newValue) => setPriceRange(newValue)}
+            onChange={handlePriceRangeChange}
             valueLabelDisplay="auto"
             min={0}
             max={100}
@@ -218,10 +249,30 @@ const Filters = () => {
         open={Boolean(anchorEl.dietary)}
         onClose={() => handleClose('dietary')}
       >
-        <MenuItem>Vegetarian</MenuItem>
-        <MenuItem>Vegan</MenuItem>
-        <MenuItem>Gluten-free</MenuItem>
-        <MenuItem>Halal</MenuItem>
+        <MenuItem
+          onClick={() => handleDietaryChange('Vegetarian')}
+          selected={dietaryFilter === 'Vegetarian'}
+        >
+          Vegetarian
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleDietaryChange('Vegan')}
+          selected={dietaryFilter === 'Vegan'}
+        >
+          Vegan
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleDietaryChange('Gluten-free')}
+          selected={dietaryFilter === 'Gluten-free'}
+        >
+          Gluten-free
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleDietaryChange('Halal')}
+          selected={dietaryFilter === 'Halal'}
+        >
+          Halal
+        </MenuItem>
       </Menu>
 
       {/* Sort Menu */}
@@ -230,22 +281,40 @@ const Filters = () => {
         open={Boolean(anchorEl.sort)}
         onClose={() => handleClose('sort')}
       >
-        <MenuItem selected={filters.sort === 'recommended'}>
+        <MenuItem
+          selected={filters.sort === 'recommended'}
+          onClick={() => handleSortChange('recommended')}
+        >
           Recommended
         </MenuItem>
-        <MenuItem selected={filters.sort === 'rating'}>
+        <MenuItem
+          selected={filters.sort === 'rating'}
+          onClick={() => handleSortChange('rating')}
+        >
           Rating
         </MenuItem>
-        <MenuItem selected={filters.sort === 'delivery_time'}>
+        <MenuItem
+          selected={filters.sort === 'delivery_time'}
+          onClick={() => handleSortChange('delivery_time')}
+        >
           Delivery time
         </MenuItem>
-        <MenuItem selected={filters.sort === 'distance'}>
+        <MenuItem
+          selected={filters.sort === 'distance'}
+          onClick={() => handleSortChange('distance')}
+        >
           Distance
         </MenuItem>
-        <MenuItem selected={filters.sort === 'price_low_high'}>
+        <MenuItem
+          selected={filters.sort === 'price_low_high'}
+          onClick={() => handleSortChange('price_low_high')}
+        >
           Price: low to high
         </MenuItem>
-        <MenuItem selected={filters.sort === 'price_high_low'}>
+        <MenuItem
+          selected={filters.sort === 'price_high_low'}
+          onClick={() => handleSortChange('price_high_low')}
+        >
           Price: high to low
         </MenuItem>
       </Menu>

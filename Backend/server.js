@@ -38,6 +38,12 @@ app.use("/api/categories", categoryRoutes);
 const menuItemRoutes = require("./routes/menuItemRoutes");
 app.use("/api/menu-items", menuItemRoutes);
 
+const cartRoutes = require('./routes/cartRoutes');
+app.use('/api/cart', cartRoutes);
+
+const orderRoutes = require('./routes/orderRoutes');
+app.use('/api/orders', orderRoutes);
+
 // health
 app.get("/", (_req, res) => res.json({ ok: true }));
 
