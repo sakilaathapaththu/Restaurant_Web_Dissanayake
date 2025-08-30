@@ -248,7 +248,7 @@ export default function EditItem() {
 
   const [item, setItem] = useState({
     name: "", menuId: "", categoryId: "", categoryName: "",
-    order: 0, itemStatus: "available", isActive: true,
+    order: 0, itemStatus: "available", isActive: true, isPopular: false,
     portions: []
   });
 
@@ -275,6 +275,7 @@ export default function EditItem() {
         order: doc.order ?? 0,
         itemStatus: doc.itemStatus || "available",
         isActive: !!doc.isActive,
+        isPopular: !!doc.isPopular,
         portions: (doc.portions || []).map(p => ({
           label: p.label || "",
           price: p.price ?? 0,
@@ -352,6 +353,7 @@ export default function EditItem() {
         order: Number(item.order) || 0,
         itemStatus: item.itemStatus,
         isActive: !!item.isActive,
+        isPopular: !!item.isPopular,
         portions: (item.portions || [])
           .filter(p => p.label?.trim())
           .map(p => ({ label: p.label.trim(), price: Number(p.price) || 0, finalPrice: Number(p.finalPrice) || Number(p.price) || 0 })),
@@ -423,10 +425,16 @@ export default function EditItem() {
                       {STATUS.map(s => <MenuItem key={s.value} value={s.value}>{s.label}</MenuItem>)}
                     </TextField>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sm={6}>
                     <FormControlLabel
                       control={<Switch checked={item.isActive} onChange={(e) => setItem(i => ({ ...i, isActive: e.target.checked }))} />}
                       label="Active"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <FormControlLabel
+                      control={<Switch checked={item.isPopular} onChange={(e) => setItem(i => ({ ...i, isPopular: e.target.checked }))} />}
+                      label="Popular Item"
                     />
                   </Grid>
 
