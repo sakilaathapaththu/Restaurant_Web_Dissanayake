@@ -22,8 +22,8 @@ const tiles = [
   { label: "Create Admin", icon: <WorkIcon fontSize="large" />, color: "#FF7262", to: "/admins/create", roles: ["superadmin"] },
   { label: "View Items", icon: <InventoryIcon fontSize="large" />, color: "#5E9C76", to: "/items", roles: ["superadmin","editor"] }, // ✅ new
   { label: "View Categories", icon: <ViewListIcon fontSize="large" />, color: "#6E59A5", to: "/categories", roles: ["superadmin","editor"] },
-  { label: "Pending Orders", icon: <EditIcon fontSize="large" />, color: "#B1CB5C", to: "/orders/pending" },
-  { label: "View All Orders", icon: <ListIcon fontSize="large" />, color: "#C9A2C8", to: "/orders" },
+  { label: "Orders", icon: <EditIcon fontSize="large" />, color: "#B1CB5C", to: "/orders" },
+  // { label: "View All Orders", icon: <ListIcon fontSize="large" />, color: "#C9A2C8", to: "/orders" },
   { label: "Inquiries", icon: <ListAltIcon fontSize="large" />, color: "#2D99FF", to: "/inquiries" },
 
 ];

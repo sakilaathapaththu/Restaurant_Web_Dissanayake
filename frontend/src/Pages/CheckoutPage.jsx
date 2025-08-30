@@ -101,9 +101,9 @@ const CheckoutPage = () => {
         }
     };
 
-    const deliveryFee = 200;
-    const serviceCharge = 50;
-    const grandTotal = totalAmount + deliveryFee + serviceCharge;
+    // const deliveryFee = 200;
+    // const serviceCharge = 50;
+    const grandTotal = totalAmount ;
 
     if (items.length === 0) {
         return null; // Will redirect
@@ -308,7 +308,7 @@ const CheckoutPage = () => {
                                         LKR {totalAmount.toLocaleString()}
                                     </Typography>
                                 </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
                                     <Typography variant="body2" sx={{ color: '#7f8c8d' }}>
                                         Delivery Fee
                                     </Typography>
@@ -323,7 +323,7 @@ const CheckoutPage = () => {
                                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                         LKR {serviceCharge.toLocaleString()}
                                     </Typography>
-                                </Box>
+                                </Box> */}
                             </Box>
 
                             <Divider sx={{ mb: 3 }} />
