@@ -15,7 +15,7 @@ const FoodSection = ({ title, foods, showSeeAll = true }) => {
   };
 
   return (
-    <Box sx={{ py: 3, backgroundColor: 'white' }}>
+    <Box sx={{ py: 3, backgroundColor: 'Seashell White' }}>
       <Container maxWidth="xl">
         {/* Section Header */}
         <Box

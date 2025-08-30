@@ -28,7 +28,7 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
   );
 
   return (
-    <Box sx={{ px: 2, py: 2, backgroundColor: 'white', position: 'relative' }}>
+    <Box sx={{ px: 2, py: 2, backgroundColor: 'Seashell White', position: 'relative' }}>
       <TextField
         fullWidth
         placeholder="Search foods and categories"
@@ -51,10 +51,10 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
           ),
           sx: {
             borderRadius: '8px',
-            backgroundColor: '#f6f6f6',
+            backgroundColor: '#ffffffff',
             '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
             '&:hover .MuiOutlinedInput-notchedOutline': { border: '1px solid #ddd' },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: '2px solid #06c167' },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { border: '2px solid #fda021' },
           },
         }}
       />

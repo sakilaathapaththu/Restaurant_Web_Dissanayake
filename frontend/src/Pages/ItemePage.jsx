@@ -144,9 +144,9 @@ const ItemsPage = () => {
   return (
     <>
       <Homepagenavbar />
-      <Box sx={{ py: 3, backgroundColor: 'white' }}>
+      <Box sx={{ py: 3, backgroundColor: '#fff5eb' /* Seashell White */ }}>
         <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-        <Filters
+        {/* <Filters
           filters={filters}
           onFilterChange={handleFilterChange}
           priceRange={priceRange}
@@ -155,7 +155,8 @@ const ItemsPage = () => {
           onRatingChange={handleRatingChange}
           onDietaryChange={handleDietaryChange}
           dietaryFilter={dietaryFilter}
-        />
+          themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }}
+        /> */}
 
         {hasActiveFilters && (
           <Box sx={{ px: 2, py: 1, display: 'flex', justifyContent: 'center' }}>
@@ -165,9 +166,9 @@ const ItemsPage = () => {
               onClick={clearAllFilters}
               sx={{
                 borderRadius: '20px',
-                borderColor: '#ddd',
-                color: '#666',
-                '&:hover': { borderColor: '#06c167', color: '#06c167' },
+                borderColor: '#2c1000',
+                color: '#2c1000',
+                '&:hover': { borderColor: '#fda021', color: '#fda021' },
               }}
             >
               Clear all filters
@@ -175,7 +176,7 @@ const ItemsPage = () => {
           </Box>
         )}
 
-        <PromoBanner />
+        <PromoBanner themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }} />
 
         {/* Render sections by categoryOrder */}
         {categoryOrder.map(categoryName => {
@@ -185,18 +186,21 @@ const ItemsPage = () => {
               : food.categories.some(cat => cat.toLowerCase() === categoryName.toLowerCase())
           );
           return foodsInCategory.length > 0 ? (
-            <FoodSection key={categoryName} title={categoryName} foods={foodsInCategory} />
+            <FoodSection
+              key={categoryName}
+              title={categoryName}
+              foods={foodsInCategory}
+              themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }}
+            />
           ) : null;
         })}
 
-        {/* Loading state */}
         {loading && <FoodSection title="Loading..." foods={[]} />}
 
-        {/* No results */}
         {!loading && filteredFoods.length === 0 && backendFoods.length > 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="text.secondary">No items found matching your search and filters.</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>Try adjusting your search terms or filters.</Typography>
+            <Typography variant="h6" color="#2c1000">No items found matching your search and filters.</Typography>
+            <Typography variant="body2" color="#2c1000" sx={{ mt: 1 }}>Try adjusting your search terms or filters.</Typography>
           </Box>
         )}
       </Box>
