@@ -424,7 +424,7 @@ const CartPanel = ({ open, onClose }) => {
                                     </Typography>
                                 </Box>
 
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                                     <Typography variant="caption">Delivery Fee</Typography>
                                     <Typography variant="caption">LKR 200</Typography>
                                 </Box>
@@ -432,7 +432,7 @@ const CartPanel = ({ open, onClose }) => {
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                                     <Typography variant="caption">Service Charge</Typography>
                                     <Typography variant="caption">LKR 50</Typography>
-                                </Box>
+                                </Box> */}
                             </Box>
 
                             <Divider sx={{ mb: 1 }} />
@@ -442,7 +442,7 @@ const CartPanel = ({ open, onClose }) => {
                                     Total
                                 </Typography>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#06c167' }}>
-                                    LKR {((totalAmount || 0) + 250).toLocaleString()}
+                                    LKR {((totalAmount || 0) ).toLocaleString()}
                                 </Typography>
                             </Box>
                         </Paper>
