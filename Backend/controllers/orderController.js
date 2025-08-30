@@ -25,8 +25,8 @@ const createOrder = async (req, res) => {
 
         // Calculate totals
         const totalAmount = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-        const deliveryFee = 200; // Fixed delivery fee
-        const serviceCharge = 50; // Fixed service charge
+        const deliveryFee = 0; // Fixed delivery fee
+        const serviceCharge = 0; // Fixed service charge
         const grandTotal = totalAmount + deliveryFee + serviceCharge;
 
         // Create order items from cart
@@ -51,7 +51,7 @@ const createOrder = async (req, res) => {
             customerName,
             customerPhone,
             address,
-            orderType: 'delivery', // Default to delivery
+            orderType: 'pickup', // Default to delivery
             paymentMethod: 'cash' // Default to cash on delivery
         });
 
