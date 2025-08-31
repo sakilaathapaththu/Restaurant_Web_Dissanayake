@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
+import PopularFoods from "../../Asset/images/categories/PopularFoods.png";
 
 const CategoryBar = ({ selectedCategory, onCategorySelect, themeColors }) => {
   const scrollRef = useRef(null);
@@ -8,7 +9,7 @@ const CategoryBar = ({ selectedCategory, onCategorySelect, themeColors }) => {
   const [scrollLeft, setScrollLeft] = useState(0);
 
 const categories = [
-  { id: "Popular Foods", name: "Popular Foods", icon: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png" },
+  { id: "Popular Foods", name: "Popular Foods", icon: PopularFoods },
   { id: "Salad", name: "Salad", icon: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png" },
   { id: "Soups", name: "Soups", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917890.png" },
   { id: "Fried Rice\n(KeeriSamba)", name: "Fried Rice\n(KeeriSamba)", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917891.png" },
