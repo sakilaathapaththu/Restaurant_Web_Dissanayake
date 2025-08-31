@@ -122,48 +122,54 @@ const MyOrdersPage = () => {
 
   //pdf invoice generation
 // pdf invoice generation
+// PDF invoice generation
 const handleGenerateInvoice = async (order) => {
   const doc = new jsPDF('p', 'pt', 'a4'); // Portrait, points, A4
-
   const pageWidth = doc.internal.pageSize.getWidth();
   let startY = 40;
 
   // Add Restaurant Logo - left
   try {
     const logoBase64 = await getBase64Image(Logo); // your imported logo
-    doc.addImage(logoBase64, 'PNG', 20, startY, 80, 40); // x, y, width, height
+    doc.addImage(logoBase64, 'PNG', 20, 40, 160, 40); // width & height
   } catch (err) {
     console.log("Logo load failed", err);
   }
 
-  // Header Text - right aligned
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("Order Invoice", pageWidth - 30, startY + 20, { align: "right" });
-  startY += 60;
+  
+  const orderId = order._id.slice(-8).toUpperCase();
+  // Contact Info - right aligned
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text("Contact No: 0777506319", pageWidth - 20, startY, { align: "right" });
+  doc.text("Email: Dissanayakesuper20@gmail.com", pageWidth - 20, startY + 15, { align: "right" });
+  doc.text("Address: No.20, Colombo Rd, Pothuhera", pageWidth - 20, startY + 30, { align: "right" });
+
+  startY += 70;
 
   // Draw horizontal line
   doc.setLineWidth(0.5);
   doc.line(20, startY, pageWidth - 20, startY);
-  startY += 15;
+  startY += 40;
 
-  // Order Info & Customer Info Box
+  // Order Info & Customer Info
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
-  doc.text("Order Info:", 20, startY);
+  doc.text("Order Info:", 20, startY);startY += 5;
   doc.setFont("helvetica", "normal");
-  doc.text(`Order Date: ${formatDate(order.createdAt)}`, 20, startY + 12);
-  doc.text(`Payment Method: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, startY + 24);
+    doc.text(`Order ID: ${orderId}`, 20, startY + 15);
+  doc.text(`Order Date: ${formatDate(order.createdAt)}`, 20, startY + 30);
+  doc.text(`Payment Method: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, startY + 45);
 
   doc.setFont("helvetica", "bold");
-  doc.text("Customer Details:", pageWidth / 2, startY);
+  doc.text("Customer Details:", pageWidth - 20, startY, { align: "right" });startY += 5;
   doc.setFont("helvetica", "normal");
-  doc.text(`Name: ${order.customerName}`, pageWidth / 2, startY + 12);
-  doc.text(`Phone: ${order.customerPhone}`, pageWidth / 2, startY + 24);
+  doc.text(`Name: ${order.customerName}`, pageWidth - 20, startY + 15, { align: "right" });
+  doc.text(`Phone: ${order.customerPhone}`, pageWidth - 20, startY + 30, { align: "right" });
   if (order.orderType === "delivery" && order.address) {
-    doc.text(`Address: ${order.address}`, pageWidth / 2, startY + 36);
+    doc.text(`Address: ${order.address}`, pageWidth - 20, startY + 45, { align: "right" });
   }
-  startY += 60;
+  startY += 80;
 
   // Draw Order Items Table Header
   doc.setFont("helvetica", "bold");
@@ -180,7 +186,6 @@ const handleGenerateInvoice = async (order) => {
   // Order Items
   doc.setFont("helvetica", "normal");
   for (const item of order.items) {
-    // Optional: Add item image
     if (item.image) {
       try {
         const imgData = await getBase64Image(item.image);
@@ -199,7 +204,6 @@ const handleGenerateInvoice = async (order) => {
 
     startY += 35;
 
-    // Page break if needed
     if (startY > doc.internal.pageSize.getHeight() - 100) {
       doc.addPage();
       startY = 40;
@@ -209,19 +213,19 @@ const handleGenerateInvoice = async (order) => {
   // Totals
   doc.setLineWidth(0.5);
   doc.line(20, startY, pageWidth - 20, startY);
-  startY += 10;
+  startY += 25;
 
   doc.setFont("helvetica", "normal");
   doc.text("Items Total:", pageWidth - 100, startY, { align: "right" });
   doc.text(`LKR ${order.totalAmount.toLocaleString()}`, pageWidth - 30, startY, { align: "right" });
 
   if (order.serviceCharge) {
-    startY += 15;
+    startY += 17;
     doc.text("Service Charge:", pageWidth - 100, startY, { align: "right" });
     doc.text(`LKR ${order.serviceCharge.toLocaleString()}`, pageWidth - 30, startY, { align: "right" });
   }
 
-  startY += 15;
+  startY += 17;
   doc.setFont("helvetica", "bold");
   doc.setTextColor(253, 160, 33);
   doc.text("Total:", pageWidth - 100, startY, { align: "right" });
@@ -229,16 +233,17 @@ const handleGenerateInvoice = async (order) => {
   doc.setTextColor(0, 0, 0);
 
   // Footer
-  startY += 40;
-  doc.setFont("helvetica", "italic");
-  doc.setFontSize(11);
-  doc.text("Thank you for your order!", pageWidth / 2, startY, { align: "center" });
+startY += 60;
+doc.setFont("helvetica", "italic");
+doc.setFontSize(11);
+doc.text("We appreciate your business and hope you enjoy your order!", pageWidth / 2, startY, { align: "center" });
 
-  // Save
-  doc.save(`Invoice_${order._id}.pdf`);
+
+  // Save PDF using real order ID
+  doc.save(`Invoice_${orderId}.pdf`);
 };
 
-// Helper function to convert image URL to Base64
+// Helper: Convert image URL to Base64
 const getBase64Image = (url) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
