@@ -20,6 +20,7 @@ import InquiriesList from "./Pages/admin/InquiriesList";
 import CheckoutPage from "./Pages/CheckoutPage";
 import MyOrdersPage from "./Pages/MyOrdersPage";
 import ViewOrders from "./Pages/admin/orders/ViewOrders";
+import ScrollToTopButton from "./Components/ScrollToTopButton";
 
 const theme = createTheme({
   palette: { mode: "light", background: { default: "#F6F9FC" } },
@@ -128,6 +129,7 @@ export default function App() {
           />
 
         </Routes>
+        <ScrollToTopButton />
       </BrowserRouter>
     </ThemeProvider>
   );
