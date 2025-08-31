@@ -94,7 +94,7 @@ const FoodCard = ({ food }) => {
           {/* Free Delivery Badge */}
           {food.deliveryFee === 0 && (
             <Chip
-              label="Free Delivery"
+              label="pickup"
               size="small"
               sx={{
                 position: 'absolute',
@@ -150,7 +150,7 @@ const FoodCard = ({ food }) => {
 
               <Typography variant="body2" sx={{ color: '#2c1000' }}>
                 {food.deliveryFee === 0
-                  ? 'Free delivery'
+                  ? 'pickup'
                   : `LKR ${food.deliveryFee} delivery`}
               </Typography>
             </Box>
