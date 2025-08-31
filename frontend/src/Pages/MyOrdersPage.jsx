@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import orderService from '../services/orderService';
 import cartService from '../services/cartService';
 import Homepagenavbar from '../Components/Navbar/Homepagenavbar';
+import Logo from '../Asset/images/mobile logo.png';
 import jsPDF from 'jspdf';
 
 const MyOrdersPage = () => {
@@ -97,7 +98,7 @@ const MyOrdersPage = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'warning';
+      // case 'pending': return 'warning';
       case 'confirmed': return 'info';
       case 'preparing': return 'primary';
       case 'ready': return 'secondary';
@@ -109,7 +110,7 @@ const MyOrdersPage = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'pending': return <Schedule />;
+      // case 'pending': return <Schedule />;
       case 'confirmed': return <CheckCircle />;
       case 'preparing': return <ShoppingBag />;
       case 'ready': return <LocalShipping />;
@@ -120,99 +121,124 @@ const MyOrdersPage = () => {
   };
 
   //pdf invoice generation
+// pdf invoice generation
 const handleGenerateInvoice = async (order) => {
-  const doc = new jsPDF();
+  const doc = new jsPDF('p', 'pt', 'a4'); // Portrait, points, A4
 
-  // Header Section
-  doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.text("✅ Your order has been confirmed", 20, 20);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let startY = 40;
 
-  // Order Info Box
-  doc.setFillColor(230, 255, 237); // light green background
-  doc.rect(15, 30, 180, 60, "F");
-
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("Order Info", 20, 40);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Order Date: ${formatDate(order.createdAt)}`, 20, 48);
-  doc.text(`Payment Method: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, 56);
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Customer Details", 20, 70);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Name: ${order.customerName}`, 20, 78);
-  doc.text(`Phone: ${order.customerPhone}`, 20, 86);
-  if (order.orderType === "delivery" && order.address) {
-    doc.text(`Address: ${order.address}`, 20, 94);
+  // Add Restaurant Logo - left
+  try {
+    const logoBase64 = await getBase64Image(Logo); // your imported logo
+    doc.addImage(logoBase64, 'PNG', 20, startY, 80, 40); // x, y, width, height
+  } catch (err) {
+    console.log("Logo load failed", err);
   }
 
-  // Order Items
-  let startY = 110;
+  // Header Text - right aligned
+  doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
-  doc.text("Order Items", 20, startY);
+  doc.text("Order Invoice", pageWidth - 30, startY + 20, { align: "right" });
+  startY += 60;
 
+  // Draw horizontal line
+  doc.setLineWidth(0.5);
+  doc.line(20, startY, pageWidth - 20, startY);
+  startY += 15;
+
+  // Order Info & Customer Info Box
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Order Info:", 20, startY);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Order Date: ${formatDate(order.createdAt)}`, 20, startY + 12);
+  doc.text(`Payment Method: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, startY + 24);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Customer Details:", pageWidth / 2, startY);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Name: ${order.customerName}`, pageWidth / 2, startY + 12);
+  doc.text(`Phone: ${order.customerPhone}`, pageWidth / 2, startY + 24);
+  if (order.orderType === "delivery" && order.address) {
+    doc.text(`Address: ${order.address}`, pageWidth / 2, startY + 36);
+  }
+  startY += 60;
+
+  // Draw Order Items Table Header
+  doc.setFont("helvetica", "bold");
+  doc.text("Item", 20, startY);
+  doc.text("Qty", pageWidth / 2 - 20, startY);
+  doc.text("Price", pageWidth / 2 + 50, startY);
+  doc.text("Total", pageWidth - 30, startY, { align: "right" });
   startY += 10;
 
-  // Draw each item with image + details
+  doc.setLineWidth(0.3);
+  doc.line(20, startY, pageWidth - 20, startY);
+  startY += 10;
+
+  // Order Items
+  doc.setFont("helvetica", "normal");
   for (const item of order.items) {
-    try {
-      if (item.image) {
-        const imgData = await getBase64Image(item.image); // helper to convert image to base64
-        doc.addImage(imgData, "JPEG", 20, startY, 25, 25);
+    // Optional: Add item image
+    if (item.image) {
+      try {
+        const imgData = await getBase64Image(item.image);
+        doc.addImage(imgData, "JPEG", 20, startY - 5, 30, 30);
+      } catch (err) {
+        console.log("Item image failed", err);
       }
-    } catch (err) {
-      console.log("Image load failed", err);
     }
 
+    doc.text(item.name, 60, startY + 10);
+    doc.text(`${item.quantity}`, pageWidth / 2 - 20, startY + 10);
+    doc.text(`LKR ${item.price.toLocaleString()}`, pageWidth / 2 + 50, startY + 10);
     doc.setFont("helvetica", "bold");
-    doc.text(item.name, 50, startY + 6);
+    doc.text(`LKR ${item.totalPrice.toLocaleString()}`, pageWidth - 30, startY + 10, { align: "right" });
     doc.setFont("helvetica", "normal");
-    doc.text(`Qty: ${item.quantity} × LKR ${item.price.toLocaleString()}`, 50, startY + 14);
-
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(253, 160, 33); // orange
-    doc.text(`LKR ${item.totalPrice.toLocaleString()}`, 190, startY + 14, { align: "right" });
-    doc.setTextColor(0, 0, 0);
 
     startY += 35;
+
+    // Page break if needed
+    if (startY > doc.internal.pageSize.getHeight() - 100) {
+      doc.addPage();
+      startY = 40;
+    }
   }
 
   // Totals
-  startY += 5;
   doc.setLineWidth(0.5);
-  doc.line(20, startY, 190, startY);
-
+  doc.line(20, startY, pageWidth - 20, startY);
   startY += 10;
+
   doc.setFont("helvetica", "normal");
-  doc.text("Items Total:", 130, startY);
-  doc.text(`LKR ${order.totalAmount.toLocaleString()}`, 190, startY, { align: "right" });
+  doc.text("Items Total:", pageWidth - 100, startY, { align: "right" });
+  doc.text(`LKR ${order.totalAmount.toLocaleString()}`, pageWidth - 30, startY, { align: "right" });
 
   if (order.serviceCharge) {
-    startY += 8;
-    doc.text("Service Charge:", 130, startY);
-    doc.text(`LKR ${order.serviceCharge.toLocaleString()}`, 190, startY, { align: "right" });
+    startY += 15;
+    doc.text("Service Charge:", pageWidth - 100, startY, { align: "right" });
+    doc.text(`LKR ${order.serviceCharge.toLocaleString()}`, pageWidth - 30, startY, { align: "right" });
   }
 
-  startY += 10;
+  startY += 15;
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(253, 160, 33); // orange for total
-  doc.text("Total:", 130, startY);
-  doc.text(`LKR ${order.grandTotal.toLocaleString()}`, 190, startY, { align: "right" });
+  doc.setTextColor(253, 160, 33);
+  doc.text("Total:", pageWidth - 100, startY, { align: "right" });
+  doc.text(`LKR ${order.grandTotal.toLocaleString()}`, pageWidth - 30, startY, { align: "right" });
   doc.setTextColor(0, 0, 0);
 
   // Footer
-  startY += 20;
+  startY += 40;
   doc.setFont("helvetica", "italic");
   doc.setFontSize(11);
-  doc.text("Thank you for your order!", 105, startY, { align: "center" });
+  doc.text("Thank you for your order!", pageWidth / 2, startY, { align: "center" });
 
   // Save
   doc.save(`Invoice_${order._id}.pdf`);
 };
 
-// Helper: convert image URL to base64 for jsPDF
+// Helper function to convert image URL to Base64
 const getBase64Image = (url) => {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -223,7 +249,7 @@ const getBase64Image = (url) => {
       canvas.height = img.height;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/jpeg"));
+      resolve(canvas.toDataURL("image/png"));
     };
     img.onerror = reject;
     img.src = url;
@@ -274,7 +300,7 @@ const getBase64Image = (url) => {
             <Button
               variant="contained"
               onClick={() => navigate('/menu')}
-              sx={{ backgroundColor: '#06c167', '&:hover': { backgroundColor: '#fda021' } }}
+              sx={{ backgroundColor: '#fda021', '&:hover': { backgroundColor: '#fda021' } }}
             >
               Browse Menu
             </Button>
@@ -305,20 +331,20 @@ const getBase64Image = (url) => {
                         </Button>
 
                         {/* Generate Invoice Button BELOW View Receipt */}
-                        {order.status === 'confirmed' && (
+                        {order.status && (
                           <Button
                             variant="contained"
                             color="success"
                             onClick={() => handleGenerateInvoice(order)}
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: '#06c167', '&:hover': { backgroundColor: '#fda021' } }}
+                            sx={{ mt: 1, backgroundColor: '#fda021', '&:hover': { backgroundColor: '#e38f1bff' } }}
                           >
                             Generate Invoice
                           </Button>
                         )}
 
                         {/* Cancel Order Button */}
-                        {['pending'].includes(order.status) && (
+                        {/* {['pending'].includes(order.status) && (
                           <Button
                             variant="outlined"
                             color="error"
@@ -330,7 +356,7 @@ const getBase64Image = (url) => {
                           >
                             {cancellingOrder === order._id ? 'Cancelling...' : 'Cancel Order'}
                           </Button>
-                        )}
+                        )} */}
 
                         {/* Inline receipt box */}
                         {expandedOrder?._id === order._id && (
@@ -347,12 +373,12 @@ const getBase64Image = (url) => {
                               boxSizing: 'border-box'
                             }}
                           >
-                            {order.status === 'confirmed' && (
+                            {/* {order.status === 'confirmed' && (
                               <Alert severity="success" sx={{ mb: 2 }}>Your order has been confirmed</Alert>
                             )}
                             {order.status === 'pending' && (
                               <Alert severity="warning" sx={{ mb: 2 }}>Your order is pending</Alert>
-                            )}
+                            )} */}
 
                             <Grid container spacing={2}>
                               {/* Left Column: Order Info & Customer Details */}
