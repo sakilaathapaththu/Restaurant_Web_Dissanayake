@@ -231,7 +231,7 @@ const ContactGuideSection = ({ onNavigateToContact }) => {
     {
       icon: <EmailIcon className="contact-icon" sx={{ fontSize: '28px', color: 'primary.main' }} />,
       title: 'Email Us',
-      content: 'info@dissanyakebakers.com',
+      content: 'Dissanayakesuper20@gmail.com',
       subContent: 'Quick response within 24 hours',
       action: 'email'
     },
