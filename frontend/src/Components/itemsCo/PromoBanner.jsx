@@ -6,9 +6,11 @@ import {
   Typography,
   Button,
   IconButton,
-  Paper,
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+
+// Import your local image
+import img1 from '../../Asset/images/img1.png';
 
 const PromoBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -19,50 +21,46 @@ const PromoBanner = () => {
       title: 'Just Celeste It!',
       subtitle: 'Get your groceries at in-store prices, TCA',
       buttonText: 'Order Now',
-      backgroundColor: '#06c167',
+      backgroundColor: '#06c16788', // overlay color for hover
       textColor: 'white',
-      image: '/api/placeholder/150/100', // Replace with your image
+      image: img1,
     },
     {
       id: 2,
       title: 'Shirohana blooms await! 🌸',
       subtitle: 'Spend over Rs. 3,000 and get 20% off, TCA',
       buttonText: 'Order Now',
-      backgroundColor: '#f0f0f0',
+      backgroundColor: '#f0f088',
       textColor: '#000',
-      image: '/api/placeholder/150/100', // Replace with your image
+      image: '/api/placeholder/150/100',
     },
     {
       id: 3,
       title: 'LKR 1,000 Off on Salary Week*',
       subtitle: 'Salary week special!',
       buttonText: 'Order Now',
-      backgroundColor: '#ff6b35',
+      backgroundColor: '#ff6b3588',
       textColor: 'white',
-      image: '/api/placeholder/150/100', // Replace with your image
+      image: img1,
     },
     {
       id: 4,
       title: 'Dissanayake Restaurant Special',
       subtitle: 'Authentic Sri Lankan cuisine with 15% off',
       buttonText: 'Order Now',
-      backgroundColor: '#1976d2',
+      backgroundColor: '#1976d288',
       textColor: 'white',
-      image: '/api/placeholder/150/100', // Replace with your image
+      image: '/api/placeholder/150/100',
     },
   ];
 
-  const nextSlide = () => {
+  const nextSlide = () =>
     setCurrentSlide((prev) => (prev + 1) % promoData.length);
-  };
-
-  const prevSlide = () => {
+  const prevSlide = () =>
     setCurrentSlide((prev) => (prev - 1 + promoData.length) % promoData.length);
-  };
 
-  // Auto-slide every 5 seconds
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
+    const timer = setInterval(nextSlide, 6000); // 5 sec auto slide
     return () => clearInterval(timer);
   }, []);
 
@@ -81,83 +79,81 @@ const PromoBanner = () => {
               key={promo.id}
               sx={{
                 minWidth: '100%',
-                backgroundColor: promo.backgroundColor,
-                color: promo.textColor,
+                height: { xs: 160, md: 260 },
                 position: 'relative',
+                borderRadius: 2,
+                color: promo.textColor,
+                backgroundImage: `url(${promo.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                transition: '0.3s',
                 overflow: 'hidden',
-                height: 260,
               }}
             >
+              {/* Overlay behind content */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 2,
+                  backgroundColor: 'rgba(25, 25, 25, 0.23)', // initial overlay
+                  transition: '0.3s',
+                  zIndex: 1,
+                  '&:hover': {
+                    backgroundColor: promo.backgroundColor,
+                    backgroundBlendMode: 'overlay',
+                  },
+                }}
+              />
+
+              {/* CardContent */}
               <CardContent
                 sx={{
+                  position: 'relative',
+                  zIndex: 2, // ensure content is above overlay
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  height: '100%',
-                  p: 3,
+                  flexDirection: { xs: 'column', md: 'row' },
+                  justifyContent: { xs: 'flex-start', md: 'space-between' },
+                  alignItems: { xs: 'flex-start', md: 'center' },
+                  height: { xs: 'auto', md: '100%' },
+                  p: { xs: 4, md: 4 },
+                  pl: { xs: 3, md: 6 },
+                  gap: { xs: 1, md: 0 },
                 }}
               >
                 <Box sx={{ flex: 1 }}>
                   <Typography
                     variant="h5"
-                    component="h2"
-                    sx={{
-                      fontWeight: 'bold',
-                      mb: 1,
-                      color: promo.textColor,
-                    }}
+                    sx={{ fontWeight: 'bold', mb: 1, fontSize: { xs: 20, md: 40 } }}
                   >
                     {promo.title}
                   </Typography>
                   <Typography
                     variant="body1"
-                    sx={{
-                      mb: 2,
-                      color: promo.textColor,
-                      opacity: 0.9,
-                    }}
+                    sx={{ mb: 2, opacity: 0.9, fontSize: { xs: 12, md: 16 } }}
                   >
                     {promo.subtitle}
                   </Typography>
                   <Button
                     variant="contained"
                     sx={{
-                      backgroundColor: promo.textColor === 'white' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
-                      color: promo.textColor,
+                      color: 'white',
                       borderRadius: 2,
                       textTransform: 'none',
                       fontWeight: 'bold',
-                      border: `1px solid ${promo.textColor}`,
-                      '&:hover': {
-                        backgroundColor: promo.textColor === 'white' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)',
-                      },
+                      backgroundColor: 'rgba(255,255,255,0.2)',
+                      border: '1px solid white',
+                      fontSize: { xs: 12, md: 14 },
+                      py: { xs: 0.5, md: 1 },
+                      px: { xs: 1.5, md: 3 },
+                      '&:hover': { backgroundColor: 'rgba(255,255,255,0.3)' },
                     }}
                   >
                     {promo.buttonText}
                   </Button>
-                </Box>
-                <Box
-                  sx={{
-                    width: 120,
-                    height: 80,
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    borderRadius: 2,
-                    ml: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <img
-                    src={promo.image}
-                    alt={promo.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: 8,
-                    }}
-                  />
                 </Box>
               </CardContent>
             </Card>
@@ -169,13 +165,11 @@ const PromoBanner = () => {
           onClick={prevSlide}
           sx={{
             position: 'absolute',
-            left: 8,
+            left: -8,
             top: '50%',
             transform: 'translateY(-50%)',
-            backgroundColor: 'rgba(255,255,255,0.8)',
-            '&:hover': {
-              backgroundColor: 'rgba(255,255,255,0.9)',
-            },
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' },
           }}
         >
           <ChevronLeft />
@@ -184,13 +178,11 @@ const PromoBanner = () => {
           onClick={nextSlide}
           sx={{
             position: 'absolute',
-            right: 8,
+            right: -8,
             top: '50%',
             transform: 'translateY(-50%)',
-            backgroundColor: 'rgba(255,255,255,0.8)',
-            '&:hover': {
-              backgroundColor: 'rgba(255,255,255,0.9)',
-            },
+            backgroundColor: 'rgba(255, 255, 255, 0)',
+            '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' },
           }}
         >
           <ChevronRight />
@@ -214,7 +206,8 @@ const PromoBanner = () => {
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                backgroundColor: currentSlide === index ? 'white' : 'rgba(255,255,255,0.5)',
+                backgroundColor:
+                  currentSlide === index ? 'white' : 'rgba(255,255,255,0.5)',
                 cursor: 'pointer',
               }}
               onClick={() => setCurrentSlide(index)}
@@ -224,7 +217,10 @@ const PromoBanner = () => {
       </Box>
 
       <Typography variant="body2" sx={{ mt: 1, color: '#666', fontSize: 12 }}>
-        Additional fees may apply. <Button sx={{ p: 0, textTransform: 'none', fontSize: 12 }}>Learn more</Button>
+        Additional fees may apply.{' '}
+        <Button sx={{ p: 0, textTransform: 'none', fontSize: 12 }}>
+          Learn more
+        </Button>
       </Typography>
     </Box>
   );
