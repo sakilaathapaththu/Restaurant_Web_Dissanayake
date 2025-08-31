@@ -86,6 +86,7 @@ const OrderSchema = new mongoose.Schema({
         enum: ['cash', 'card', 'online'],
         default: 'cash'
     },
+    pickupTime: { type: String },
     paymentStatus: {
         type: String,
         enum: ['pending', 'paid', 'failed'],
