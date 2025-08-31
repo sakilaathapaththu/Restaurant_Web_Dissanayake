@@ -358,7 +358,7 @@ return (
                 </Typography>
                 </Grid>
                 
-                <Grid item xs={12} md={4}>
+                {/* <Grid item xs={12} md={4}>
                 <Box
                     sx={{
                     display: 'flex',
@@ -382,7 +382,7 @@ return (
                     BlackCode Devs
                     </BlackCodeLink>
                 </Box>
-                </Grid>
+                </Grid> */}
             </Grid>
             </CopyrightSection>
         </Fade>
