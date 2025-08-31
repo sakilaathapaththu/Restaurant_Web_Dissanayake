@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 
 const StyledFab = styled(Fab)(({ theme }) => ({
 position: 'fixed',
-bottom: theme.spacing(13),
+bottom: theme.spacing(15),
 right: theme.spacing(3),
 backgroundColor: '#fda021',
 color: '#2c1000',
