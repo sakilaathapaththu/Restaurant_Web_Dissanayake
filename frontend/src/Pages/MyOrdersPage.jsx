@@ -164,8 +164,8 @@ const handleGenerateInvoice = async (order) => {
   doc.setFont("helvetica", "bold");
   doc.text("Customer Details:", pageWidth - 20, startY, { align: "right" });startY += 5;
   doc.setFont("helvetica", "normal");
-  doc.text(`Name: ${order.customerName}`, pageWidth - 20, startY + 15, { align: "right" });
-  doc.text(`Phone: ${order.customerPhone}`, pageWidth - 20, startY + 30, { align: "right" });
+  doc.text(`Name: ${order.customerName}`, pageWidth - 20, startY + 30, { align: "right" });
+  doc.text(`Phone: ${order.customerPhone}`, pageWidth - 20, startY + 15, { align: "right" });
   if (order.orderType === "delivery" && order.address) {
     doc.text(`Address: ${order.address}`, pageWidth - 20, startY + 45, { align: "right" });
   }
