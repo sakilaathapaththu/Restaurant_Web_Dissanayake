@@ -5,6 +5,7 @@ import Homepagenavbar from '../Components/Navbar/Homepagenavbar';
 import SearchBar from '../Components/itemsCo/SearchBar';
 import PromoBanner from '../Components/itemsCo/PromoBanner';
 import FoodSection from '../Components/itemsCo/FoodSection';
+import CategoryBar from '../Components/itemsCo/CategoryBar';
 import API from '../Utils/api';
 import fallbackImage from '../Asset/images/foods/chicken-fried-rice.jpg';
 
@@ -109,7 +110,7 @@ const ItemsPage = () => {
       );
     }
 
-    // ✅ Apply category filter
+    // Apply category filter
     if (selectedCategory !== "All") {
       filtered = filtered.filter(food =>
         selectedCategory === "Popular Foods"
@@ -180,35 +181,13 @@ const ItemsPage = () => {
 
         <PromoBanner themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }} />
 
-        {/* ✅ Category Bar */}
-        <Box
-          sx={{
-            display: "flex",
-            overflowX: "auto",
-            gap: 1,
-            px: 2,
-            py: 1,
-            whiteSpace: "nowrap",
-            scrollbarWidth: "none",
-            "&::-webkit-scrollbar": { display: "none" }
-          }}
-        >
-          {["All", ...categoryOrder].map((cat) => (
-            <Chip
-              key={cat}
-              label={cat}
-              onClick={() => setSelectedCategory(cat)}
-              sx={{
-                borderRadius: "20px",
-                fontWeight: 500,
-                cursor: "pointer",
-                backgroundColor: selectedCategory === cat ? "#fda021" : "#e8d5c4",
-                color: selectedCategory === cat ? "#fff" : "#2c1000",
-                "&:hover": { backgroundColor: "#fda021", color: "#fff" },
-              }}
-            />
-          ))}
-        </Box>
+        {/*  CategoryBar inserted here */}
+        <CategoryBar
+          categories={["All", ...categoryOrder]}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+          themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
+        />
 
         {/* Render Foods */}
         {selectedCategory === "All"
