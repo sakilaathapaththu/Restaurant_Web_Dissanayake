@@ -594,7 +594,7 @@ export default function ContactBooking() {
                         </IconButton>
                         <Box>
                           <Typography variant="body1" fontWeight={600} sx={{ fontSize: { xs: '0.85rem', md: '0.9rem' } }}>
-                            +94 77 123 4567
+                            +94 77 750 6319
                           </Typography>
                           <Typography variant="body2" sx={{ color: '#e8d5c4', fontSize: { xs: '0.75rem', md: '0.8rem' } }}>
                             Available 8:00 AM - 10:00 PM
@@ -618,7 +618,7 @@ export default function ContactBooking() {
                         </IconButton>
                         <Box>
                           <Typography variant="body1" fontWeight={600} sx={{ fontSize: { xs: '0.85rem', md: '0.9rem' } }}>
-                            info@dissanayakebakers.com
+                            Dissanayakesuper20@gmail.com
                           </Typography>
                           <Typography variant="body2" sx={{ color: '#e8d5c4', fontSize: { xs: '0.75rem', md: '0.8rem' } }}>
                             We'll respond within 24 hours
@@ -642,7 +642,7 @@ export default function ContactBooking() {
                         </IconButton>
                         <Box>
                           <Typography variant="body1" fontWeight={600} sx={{ fontSize: { xs: '0.85rem', md: '0.9rem' } }}>
-                            123 Main Street, Colombo 01
+                            No.20, Colombo Road, Pothuhera
                           </Typography>
                           <Typography variant="body2" sx={{ color: '#e8d5c4', fontSize: { xs: '0.75rem', md: '0.8rem' } }}>
                             Sri Lanka
