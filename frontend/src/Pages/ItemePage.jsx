@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, Chip } from '@mui/material';
 import { Clear as ClearIcon } from '@mui/icons-material';
 import Homepagenavbar from '../Components/Navbar/Homepagenavbar';
 import SearchBar from '../Components/itemsCo/SearchBar';
-import Filters from '../Components/itemsCo/Filters';
 import PromoBanner from '../Components/itemsCo/PromoBanner';
 import FoodSection from '../Components/itemsCo/FoodSection';
+import CategoryBar from '../Components/itemsCo/CategoryBar';
 import API from '../Utils/api';
 import fallbackImage from '../Asset/images/foods/chicken-fried-rice.jpg';
 
@@ -32,6 +32,7 @@ const ItemsPage = () => {
   const [priceRange, setPriceRange] = useState([0, 100]);
   const [minRating, setMinRating] = useState(4);
   const [dietaryFilter, setDietaryFilter] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Fetch backend menu
   useEffect(() => {
@@ -84,6 +85,7 @@ const ItemsPage = () => {
     fetchMenuItems();
   }, []);
 
+  // Filtering & sorting
   const getFilteredFoods = () => {
     let filtered = [...backendFoods];
 
@@ -108,9 +110,22 @@ const ItemsPage = () => {
       );
     }
 
+    // Apply category filter
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(food =>
+        selectedCategory === "Popular Foods"
+          ? food.isPopular
+          : food.categories.some(cat => cat.toLowerCase() === selectedCategory.toLowerCase())
+      );
+    }
+
+    // Sorting
     switch (filters.sort) {
       case 'rating': filtered.sort((a, b) => b.rating - a.rating); break;
-      case 'delivery_time': filtered.sort((a, b) => parseInt(a.deliveryTime.match(/\d+/)?.[0] || '30') - parseInt(b.deliveryTime.match(/\d+/)?.[0] || '30')); break;
+      case 'delivery_time': filtered.sort((a, b) =>
+        parseInt(a.deliveryTime.match(/\d+/)?.[0] || '30') -
+        parseInt(b.deliveryTime.match(/\d+/)?.[0] || '30')
+      ); break;
       case 'distance': filtered.sort((a, b) => a.distance - b.distance); break;
       case 'price_low_high': filtered.sort((a, b) => a.price - b.price); break;
       case 'price_high_low': filtered.sort((a, b) => b.price - a.price); break;
@@ -122,41 +137,29 @@ const ItemsPage = () => {
 
   const filteredFoods = getFilteredFoods();
 
+  // Handlers
   const handleSearchChange = term => setSearchTerm(term);
-  const handleFilterChange = newFilters => setFilters(newFilters);
-  const handlePriceRangeChange = range => setPriceRange(range);
-  const handleRatingChange = rating => setMinRating(rating);
-  const handleDietaryChange = dietary => setDietaryFilter(dietary);
   const clearAllFilters = () => {
     setSearchTerm('');
     setFilters({ offers: false, deliveryFee: false, under30min: false, rating: false, price: false, dietary: false, sort: 'recommended' });
     setPriceRange([0, 100]);
     setMinRating(4);
     setDietaryFilter('');
+    setSelectedCategory('All');
   };
 
   const hasActiveFilters = searchTerm ||
     Object.values(filters).some(value => value !== false && value !== 'recommended') ||
     dietaryFilter ||
     priceRange[0] !== 0 || priceRange[1] !== 100 ||
-    minRating !== 4;
+    minRating !== 4 ||
+    selectedCategory !== 'All';
 
   return (
     <>
       <Homepagenavbar />
-      <Box sx={{ py: 3, backgroundColor: '#fff5eb' /* Seashell White */ }}>
+      <Box sx={{ py: 3, backgroundColor: '#fff5eb' }}>
         <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-        {/* <Filters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          priceRange={priceRange}
-          onPriceRangeChange={handlePriceRangeChange}
-          minRating={minRating}
-          onRatingChange={handleRatingChange}
-          onDietaryChange={handleDietaryChange}
-          dietaryFilter={dietaryFilter}
-          themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }}
-        /> */}
 
         {hasActiveFilters && (
           <Box sx={{ px: 2, py: 1, display: 'flex', justifyContent: 'center' }}>
@@ -178,29 +181,48 @@ const ItemsPage = () => {
 
         <PromoBanner themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }} />
 
-        {/* Render sections by categoryOrder */}
-        {categoryOrder.map(categoryName => {
-          const foodsInCategory = filteredFoods.filter(food =>
-            categoryName === 'Popular Foods'
-              ? food.isPopular
-              : food.categories.some(cat => cat.toLowerCase() === categoryName.toLowerCase())
-          );
-          return foodsInCategory.length > 0 ? (
+        {/*  CategoryBar inserted here */}
+        <CategoryBar
+          categories={["All", ...categoryOrder]}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+          themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
+        />
+
+        {/* Render Foods */}
+        {selectedCategory === "All"
+          ? categoryOrder.map((categoryName) => {
+              const foodsInCategory = filteredFoods.filter(food =>
+                categoryName === "Popular Foods"
+                  ? food.isPopular
+                  : food.categories.some(cat => cat.toLowerCase() === categoryName.toLowerCase())
+              );
+              return foodsInCategory.length > 0 ? (
+                <FoodSection
+                  key={categoryName}
+                  title={categoryName}
+                  foods={foodsInCategory}
+                  themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
+                />
+              ) : null;
+            })
+          : (
             <FoodSection
-              key={categoryName}
-              title={categoryName}
-              foods={foodsInCategory}
-              themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }}
+              title={selectedCategory}
+              foods={filteredFoods}
+              themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
             />
-          ) : null;
-        })}
+          )
+        }
 
         {loading && <FoodSection title="Loading..." foods={[]} />}
 
         {!loading && filteredFoods.length === 0 && backendFoods.length > 0 && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h6" color="#2c1000">No items found matching your search and filters.</Typography>
-            <Typography variant="body2" color="#2c1000" sx={{ mt: 1 }}>Try adjusting your search terms or filters.</Typography>
+            <Typography variant="h6" color="#2c1000">No items found.</Typography>
+            <Typography variant="body2" color="#2c1000" sx={{ mt: 1 }}>
+              Try adjusting your search terms or filters.
+            </Typography>
           </Box>
         )}
       </Box>
