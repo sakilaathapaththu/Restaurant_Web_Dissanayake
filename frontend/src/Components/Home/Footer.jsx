@@ -194,7 +194,7 @@ const handleSocialClick = (platform) => {
     instagram: 'https://instagram.com/dissanyakebakers',
     facebook: 'https://facebook.com/dissanyakebakers',
     tiktok: 'https://tiktok.com/@dissanyakebakers',
-    whatsapp: 'https://wa.me/94771234567'
+    whatsapp: 'https://wa.me/0777506319',
     };
     
     window.open(urls[platform], '_blank', 'noopener,noreferrer');
