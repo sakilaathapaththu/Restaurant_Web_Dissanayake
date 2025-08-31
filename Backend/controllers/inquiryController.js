@@ -1,4 +1,4 @@
-const Inquiry = require("../models/inquiry");
+const Inquiry = require("../models/Inquiry");
 const { sendTemplateWithParams, RESTAURANT_OFFICIAL_WA } = require("../services/whatsapp");
 
 const clean = (s = "") => String(s).replace(/\s+/g, " ").trim();

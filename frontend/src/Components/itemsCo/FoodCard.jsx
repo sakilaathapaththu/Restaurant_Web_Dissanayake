@@ -39,9 +39,9 @@ const FoodCard = ({ food }) => {
           transition: 'all 0.3s ease-in-out',
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: '0 4px 20px rgba(124, 124, 124, 0.22)',
+            boxShadow: '0 4px 20px rgba(44,16,0,0.22)', // dark brown shadow
           },
-          borderRadius: 2,
+          borderRadius: 1,
           overflow: 'hidden',
         }}
       >
@@ -61,15 +61,15 @@ const FoodCard = ({ food }) => {
               position: 'absolute',
               top: 8,
               right: 8,
-              backgroundColor: 'rgba(255,255,255,0.9)',
-              '&:hover': { backgroundColor: 'rgba(255,255,255,1)' },
+              backgroundColor: 'rgba(232,213,196,0.9)', // beige semi-transparent
+              '&:hover': { backgroundColor: 'rgba(232,213,196,1)' },
             }}
             size="small"
           >
             {isFavorite ? (
-              <Favorite sx={{ color: '#ff4444', fontSize: 20 }} />
+              <Favorite sx={{ color: '#fda021', fontSize: 20 }} /> // accent orange
             ) : (
-              <FavoriteBorder sx={{ fontSize: 20 }} />
+              <FavoriteBorder sx={{ color: '#2c1000', fontSize: 20 }} /> // dark brown
             )}
           </IconButton>
 
@@ -78,13 +78,13 @@ const FoodCard = ({ food }) => {
             <Chip
               label={food.offer}
               size="small"
-              icon={<LocalOffer sx={{ fontSize: 14 }} />}
+              icon={<LocalOffer sx={{ fontSize: 14, color: '#fff' }} />}
               sx={{
                 position: 'absolute',
                 bottom: 8,
                 left: 8,
-                backgroundColor: '#ff4444',
-                color: 'white',
+                backgroundColor: '#fda021', // accent orange
+                color: '#fff',
                 fontSize: '12px',
                 height: 24,
               }}
@@ -94,14 +94,14 @@ const FoodCard = ({ food }) => {
           {/* Free Delivery Badge */}
           {food.deliveryFee === 0 && (
             <Chip
-              label="Free Delivery"
+              label="pickup"
               size="small"
               sx={{
                 position: 'absolute',
                 top: 8,
                 left: 8,
-                backgroundColor: '#06c167',
-                color: 'white',
+                backgroundColor: '#2c1000', // dark brown
+                color: '#e8d5c4', // light beige
                 fontSize: '12px',
                 height: 24,
               }}
@@ -129,6 +129,7 @@ const FoodCard = ({ food }) => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                color: '#2c1000', // dark brown
               }}
             >
               {food.name}
@@ -143,21 +144,21 @@ const FoodCard = ({ food }) => {
                 mb: 1,
               }}
             >
-              <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#06c167' }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#fda021' }}>
                 LKR {food.price?.toLocaleString()}
               </Typography>
 
-              <Typography variant="body2" sx={{ color: '#666' }}>
+              <Typography variant="body2" sx={{ color: '#2c1000' }}>
                 {food.deliveryFee === 0
-                  ? 'Free delivery'
+                  ? 'pickup'
                   : `LKR ${food.deliveryFee} delivery`}
               </Typography>
             </Box>
 
             {/* Rating */}
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Rating value={food.rating} readOnly size="small" precision={0.1} sx={{ mr: 1 }} />
-              <Typography variant="body2" sx={{ color: '#666', fontSize: '14px' }}>
+              <Rating value={food.rating} readOnly size="small" precision={0.1} sx={{ mr: 1, color: '#fda021' }} />
+              <Typography variant="body2" sx={{ color: '#2c1000', fontSize: '14px' }}>
                 {food.rating} ({food.reviewCount.toLocaleString()})
               </Typography>
             </Box>
@@ -170,13 +171,13 @@ const FoodCard = ({ food }) => {
                   label={category}
                   size="small"
                   variant="outlined"
-                  sx={{ fontSize: '11px', height: 20, borderColor: '#ddd', color: '#666' }}
+                  sx={{ fontSize: '11px', height: 20, borderColor: '#2c1000', color: '#2c1000' }}
                 />
               ))}
               {food.categories.length > 3 && (
                 <Typography
                   variant="body2"
-                  sx={{ color: '#666', fontSize: '11px', alignSelf: 'center' }}
+                  sx={{ color: '#2c1000', fontSize: '11px', alignSelf: 'center' }}
                 >
                   +{food.categories.length - 3} more
                 </Typography>

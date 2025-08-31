@@ -7,6 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
+// app.use(cors({ origin: process.env.CORS_ORIGIN || "http://72.60.42.120:3000" }));
 app.use(express.json());
 app.use(morgan("tiny"));
 
@@ -37,6 +38,12 @@ app.use("/api/categories", categoryRoutes);
 
 const menuItemRoutes = require("./routes/menuItemRoutes");
 app.use("/api/menu-items", menuItemRoutes);
+
+const cartRoutes = require('./routes/cartRoutes');
+app.use('/api/cart', cartRoutes);
+
+const orderRoutes = require('./routes/orderRoutes');
+app.use('/api/orders', orderRoutes);
 
 // health
 app.get("/", (_req, res) => res.json({ ok: true }));
