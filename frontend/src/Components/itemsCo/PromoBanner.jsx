@@ -9,8 +9,9 @@ import {
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
-// Import your local image
+// Import your local images
 import img1 from '../../Asset/images/img1.png';
+import img2 from '../../Asset/images/promo/itembanner2.png';
 
 const PromoBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -32,7 +33,7 @@ const PromoBanner = () => {
       buttonText: 'Order Now',
       backgroundColor: '#f0f088',
       textColor: '#000',
-      image: '/api/placeholder/150/100',
+      image: img2,
     },
     {
       id: 3,
