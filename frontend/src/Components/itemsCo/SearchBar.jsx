@@ -14,9 +14,8 @@ const SearchBar = ({ searchTerm = '', onSearchChange }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const popularSearches = [
-    'Pizza', 'Burgers', 'Sushi', 'Thai Food', 'Chinese', 'Ice Cream',
-    'Coffee', 'Healthy', 'Fast Food', 'Desserts', 'Salad', 'Fried Rice',
-    'Chicken', 'Beef', 'Fish', 'Biryani', 'Pasta'
+    'Chicken', 'Beef', 'Fish , Cuttlefish, Prawns', 'Pasta', 'Dum Biryani', 'Indian',
+    'Coffee', 'Healthy', 'Fast Food', 'Desserts', 'Salad', 'Fried Rice'
   ];
 
   const handleClear = () => onSearchChange?.('');
