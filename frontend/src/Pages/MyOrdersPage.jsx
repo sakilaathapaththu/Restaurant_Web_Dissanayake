@@ -119,87 +119,121 @@ const MyOrdersPage = () => {
     }
   };
 
-  const handleGenerateInvoice = (order) => {
-    const doc = new jsPDF();
+  //pdf invoice generation
+const handleGenerateInvoice = async (order) => {
+  const doc = new jsPDF();
 
-    // Header (Restaurant Branding)
-    doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("🍴 Delicious Restaurant", 105, 20, { align: "center" });
+  // Header Section
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.text("✅ Your order has been confirmed", 20, 20);
 
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text("123 Food Street, Colombo, Sri Lanka", 105, 28, { align: "center" });
-    doc.text("Tel: +94 77 123 4567", 105, 34, { align: "center" });
+  // Order Info Box
+  doc.setFillColor(230, 255, 237); // light green background
+  doc.rect(15, 30, 180, 60, "F");
 
-    // Invoice title
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("INVOICE", 105, 50, { align: "center" });
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Order Info", 20, 40);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Order Date: ${formatDate(order.createdAt)}`, 20, 48);
+  doc.text(`Payment Method: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, 56);
 
-    // Order info
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Order ID: #${order._id.slice(-8).toUpperCase()}`, 20, 70);
-    doc.text(`Date: ${formatDate(order.createdAt)}`, 20, 78);
-    doc.text(`Payment: ${order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}`, 20, 86);
+  doc.setFont("helvetica", "bold");
+  doc.text("Customer Details", 20, 70);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Name: ${order.customerName}`, 20, 78);
+  doc.text(`Phone: ${order.customerPhone}`, 20, 86);
+  if (order.orderType === "delivery" && order.address) {
+    doc.text(`Address: ${order.address}`, 20, 94);
+  }
 
-    // Customer info
-    doc.text(`Customer: ${order.customerName}`, 120, 70);
-    doc.text(`Phone: ${order.customerPhone}`, 120, 78);
-    if (order.orderType === "delivery" && order.address) {
-      doc.text(`Address: ${order.address}`, 120, 86);
+  // Order Items
+  let startY = 110;
+  doc.setFont("helvetica", "bold");
+  doc.text("Order Items", 20, startY);
+
+  startY += 10;
+
+  // Draw each item with image + details
+  for (const item of order.items) {
+    try {
+      if (item.image) {
+        const imgData = await getBase64Image(item.image); // helper to convert image to base64
+        doc.addImage(imgData, "JPEG", 20, startY, 25, 25);
+      }
+    } catch (err) {
+      console.log("Image load failed", err);
     }
 
-    // Table Header
-    let startY = 105;
     doc.setFont("helvetica", "bold");
-    doc.text("Item", 20, startY);
-    doc.text("Qty", 100, startY);
-    doc.text("Price", 130, startY);
-    doc.text("Total", 170, startY);
-
-    doc.line(20, startY + 2, 190, startY + 2); // underline header
-    startY += 10;
-
-    // Table Rows
+    doc.text(item.name, 50, startY + 6);
     doc.setFont("helvetica", "normal");
-    order.items.forEach((item) => {
-      doc.text(item.name, 20, startY);
-      doc.text(`${item.quantity}`, 105, startY, { align: "center" });
-      doc.text(`LKR ${item.price.toLocaleString()}`, 130, startY, { align: "right" });
-      doc.text(`LKR ${item.totalPrice.toLocaleString()}`, 190, startY, { align: "right" });
-      startY += 8;
-    });
+    doc.text(`Qty: ${item.quantity} × LKR ${item.price.toLocaleString()}`, 50, startY + 14);
 
-    doc.line(20, startY, 190, startY);
-
-    // Summary
-    startY += 10;
-    doc.text(`Items Total:`, 130, startY);
-    doc.text(`LKR ${order.totalAmount.toLocaleString()}`, 190, startY, { align: "right" });
-
-    if (order.serviceCharge) {
-      startY += 8;
-      doc.text(`Service Charge:`, 130, startY);
-      doc.text(`LKR ${order.serviceCharge.toLocaleString()}`, 190, startY, { align: "right" });
-    }
-
-    startY += 10;
     doc.setFont("helvetica", "bold");
-    doc.text(`Grand Total:`, 130, startY);
-    doc.text(`LKR ${order.grandTotal.toLocaleString()}`, 190, startY, { align: "right" });
+    doc.setTextColor(253, 160, 33); // orange
+    doc.text(`LKR ${item.totalPrice.toLocaleString()}`, 190, startY + 14, { align: "right" });
+    doc.setTextColor(0, 0, 0);
 
-    // Footer
-    startY += 20;
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(11);
-    doc.text("Thank you for dining with Delicious Restaurant!", 105, startY, { align: "center" });
-    doc.text("Visit us again 🍽️", 105, startY + 8, { align: "center" });
+    startY += 35;
+  }
 
-    // Save PDF
-    doc.save(`Invoice_${order._id}.pdf`);
-  };
+  // Totals
+  startY += 5;
+  doc.setLineWidth(0.5);
+  doc.line(20, startY, 190, startY);
+
+  startY += 10;
+  doc.setFont("helvetica", "normal");
+  doc.text("Items Total:", 130, startY);
+  doc.text(`LKR ${order.totalAmount.toLocaleString()}`, 190, startY, { align: "right" });
+
+  if (order.serviceCharge) {
+    startY += 8;
+    doc.text("Service Charge:", 130, startY);
+    doc.text(`LKR ${order.serviceCharge.toLocaleString()}`, 190, startY, { align: "right" });
+  }
+
+  startY += 10;
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(253, 160, 33); // orange for total
+  doc.text("Total:", 130, startY);
+  doc.text(`LKR ${order.grandTotal.toLocaleString()}`, 190, startY, { align: "right" });
+  doc.setTextColor(0, 0, 0);
+
+  // Footer
+  startY += 20;
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(11);
+  doc.text("Thank you for your order!", 105, startY, { align: "center" });
+
+  // Save
+  doc.save(`Invoice_${order._id}.pdf`);
+};
+
+// Helper: convert image URL to base64 for jsPDF
+const getBase64Image = (url) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.setAttribute("crossOrigin", "anonymous");
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/jpeg"));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+};
+
+//pdf invoice generation----------------------------------------------------------------------------
+
+
+
 
   if (loading && orders.length === 0) {
     return (
@@ -259,6 +293,7 @@ const MyOrdersPage = () => {
                         </Box>
                         <Typography variant="body2" color="text.secondary">{formatDate(order.createdAt)}</Typography>
 
+                        {/* View Receipt */}
                         <Button
                           variant="outlined"
                           startIcon={<Visibility />}
@@ -269,6 +304,20 @@ const MyOrdersPage = () => {
                           {expandedOrder?._id === order._id ? 'Hide Receipt' : 'View Receipt'}
                         </Button>
 
+                        {/* Generate Invoice Button BELOW View Receipt */}
+                        {order.status === 'confirmed' && (
+                          <Button
+                            variant="contained"
+                            color="success"
+                            onClick={() => handleGenerateInvoice(order)}
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: '#06c167', '&:hover': { backgroundColor: '#fda021' } }}
+                          >
+                            Generate Invoice
+                          </Button>
+                        )}
+
+                        {/* Cancel Order Button */}
                         {['pending'].includes(order.status) && (
                           <Button
                             variant="outlined"
@@ -321,13 +370,14 @@ const MyOrdersPage = () => {
                               </Grid>
 
                               {/* Right Column: Order Items */}
+                              
                               <Grid item xs={12} md={6}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'center' }}>Order Items</Typography>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'flex-start' }}>Order Items</Typography>
                                 <Box sx={{ maxHeight: 250, overflowY: 'auto', pr: 1 }}>
                                   {order.items.map((item, i) => (
                                     <Card key={i} sx={{ mb: 1 }}>
                                       <CardContent sx={{ p: 1 }}>
-                                        <Grid container spacing={1} alignItems="center">
+                                        <Grid container spacing={9} alignItems="center">
                                           <Grid item xs={4}>
                                             <CardMedia
                                               component="img"
@@ -337,7 +387,7 @@ const MyOrdersPage = () => {
                                             />
                                           </Grid>
                                           <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{item.name}</Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold', textAlign: 'right' }}>{item.name}</Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right' }}>
                                               Qty: {item.quantity} × LKR {item.price.toLocaleString()}
                                             </Typography>
@@ -373,16 +423,6 @@ const MyOrdersPage = () => {
                             </Grid>
 
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                              {order.status === 'confirmed' && (
-                                <Button 
-                                  onClick={() => handleGenerateInvoice(order)} 
-                                  color="primary" 
-                                  sx={{ mr: 1, backgroundColor: '#06c167', color: 'white',
-                                        '&:hover': { backgroundColor: '#fda021' } }}
-                                >
-                                  Generate Invoice
-                                </Button>
-                              )}
                               <Button onClick={() => setExpandedOrder(null)}>Close</Button>
                             </Box>
                           </Paper>
