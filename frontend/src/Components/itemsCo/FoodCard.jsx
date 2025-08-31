@@ -186,9 +186,9 @@ const FoodCard = ({ food }) => {
           </Box>
 
           {/* Distance */}
-          <Typography variant="body2" sx={{ color: '#999', fontSize: '12px', mt: 'auto' }}>
+          {/* <Typography variant="body2" sx={{ color: '#999', fontSize: '12px', mt: 'auto' }}>
             {food.distance} km away
-          </Typography>
+          </Typography> */}
         </CardContent>
       </Card>
 
