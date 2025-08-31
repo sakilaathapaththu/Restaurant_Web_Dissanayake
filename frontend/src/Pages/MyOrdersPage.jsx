@@ -333,53 +333,96 @@ const getBase64Image = (url) => {
                               )}
                             </Grid>
 
-                            {/* Right Column: Uniform Order Items */}
-                            <Grid item xs={12} md={6}>
-                              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Order Items</Typography>
-                              <Box sx={{ maxHeight: 250, overflowY: 'auto', pr: 1 }}>
-                                {order.items.map((item, i) => (
-                                  <Card key={i} sx={{ mb: 1, minHeight: 80, display: 'flex', alignItems: 'center', px: 1, py: 1 }}>
-                                    <CardMedia 
+                              {/* Right Column: Uniform Order Items */}
+                              <Grid item xs={12} md={6}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>Order Items</Typography>
+                                <Box sx={{ maxHeight: 250, overflowY: 'auto', pr: 1 }}>
+                                  {order.items.map((item, i) => (
+                                    <Card 
+                                      key={i} 
+                                      sx={{ 
+                                        mb: 1, 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        p: 1, 
+                                        flexWrap: 'nowrap' 
+                                      }}
+                                    >
+                                      <CardMedia
                                         component="img"
                                         image={item.image || '/placeholder-food.jpg'}
                                         alt={item.name}
-                                        sx={{ width: 50, height: 60, objectFit: 'cover', borderRadius: 1 }}
+                                        sx={{ 
+                                          width: 60, 
+                                          height: 60, 
+                                          objectFit: 'cover', 
+                                          borderRadius: 1,
+                                          flexShrink: 0 
+                                        }}
                                       />
-
-                                    <Stack spacing={0.3} sx={{ ml: 11, flex: 1 }}>
-                                      <Typography variant="body2" sx={{ fontWeight: 'bold', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                        {item.name}
-                                      </Typography>
-                                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                                        Qty: {item.quantity} × LKR {item.price.toLocaleString()}
-                                      </Typography>
-                                      <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#fda021', textAlign: 'right' }}>
-                                        LKR {item.totalPrice.toLocaleString()}
-                                      </Typography>
-                                    </Stack>
-                                  </Card>
-                                ))}
-                              </Box>
-
-                              <Divider sx={{ my: 1 }} />
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                <Typography variant="body2">Items Total</Typography>
-                                <Typography variant="body2" sx={{ textAlign: 'right' }}>LKR {order.totalAmount.toLocaleString()}</Typography>
-                              </Box>
-                              {order.serviceCharge && (
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                  <Typography variant="body2">Service Charge</Typography>
-                                  <Typography variant="body2" sx={{ textAlign: 'right' }}>LKR {order.serviceCharge.toLocaleString()}</Typography>
+                                      
+                                      <Box 
+                                        sx={{ 
+                                          ml: 2, 
+                                          minWidth: 0, 
+                                          flex: 1,
+                                          display: 'flex', 
+                                          flexDirection: 'column',
+                                        }}
+                                      >
+                                        <Typography 
+                                          variant="body2" 
+                                          sx={{ 
+                                            fontWeight: 'bold', 
+                                            whiteSpace: 'nowrap', 
+                                            overflow: 'hidden', 
+                                            textOverflow: 'ellipsis', 
+                                            width: '100%' 
+                                          }}
+                                        >
+                                          {item.name}
+                                        </Typography>
+                                        <Typography 
+                                          variant="body2" 
+                                          color="text.secondary"
+                                        >
+                                          Qty: {item.quantity} × LKR {item.price.toLocaleString()}
+                                        </Typography>
+                                        <Typography 
+                                          variant="body2" 
+                                          sx={{ fontWeight: 'bold', color: '#fda021' }}
+                                        >
+                                          LKR {item.totalPrice.toLocaleString()}
+                                        </Typography>
+                                      </Box>
+                                    </Card>
+                                  ))}
                                 </Box>
-                              )}
-                              <Divider sx={{ my: 1 }} />
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0 }}>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#fda021', textAlign: 'right' }}>
-                                  LKR {order.grandTotal.toLocaleString()}
-                                </Typography>
-                              </Box>
-                            </Grid>
+
+                                <Divider sx={{ my: 1 }} />
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                  <Typography variant="body2">Items Total</Typography>
+                                  <Typography variant="body2" sx={{ textAlign: 'right' }}>
+                                    LKR {order.totalAmount.toLocaleString()}
+                                  </Typography>
+                                </Box>
+                                {order.serviceCharge && (
+                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                    <Typography variant="body2">Service Charge</Typography>
+                                    <Typography variant="body2" sx={{ textAlign: 'right' }}>
+                                      LKR {order.serviceCharge.toLocaleString()}
+                                    </Typography>
+                                  </Box>
+                                )}
+                                <Divider sx={{ my: 1 }} />
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0 }}>
+                                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total</Typography>
+                                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#fda021', textAlign: 'right' }}>
+                                    LKR {order.grandTotal.toLocaleString()}
+                                  </Typography>
+                                </Box>
+                              </Grid>
+
                           </Grid>
                           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
                             <Button onClick={() => setExpandedOrder(null)}>Close</Button>
