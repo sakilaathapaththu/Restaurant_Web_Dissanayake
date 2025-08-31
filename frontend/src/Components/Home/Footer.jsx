@@ -254,7 +254,7 @@ return (
                     <Email fontSize="small" />
                     </ContactIcon>
                     <FooterText sx={{ mb: 0 }}>
-                    info@dissanyakebakers.com
+                    Dissanayakesuper20@gmail.com
                     </FooterText>
                 </ContactItem>
                 </Box>
