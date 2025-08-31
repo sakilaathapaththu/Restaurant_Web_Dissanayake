@@ -186,7 +186,7 @@ const ItemsPage = () => {
           categories={["All", ...categoryOrder]}
           selectedCategory={selectedCategory}
           onCategorySelect={setSelectedCategory}
-          themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
+          themeColors={{ primary: "#2c1000", secondary: "#ffffffff", accent: "#fda021" }}
         />
 
         {/* Render Foods */}

@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import PopularFoods from "../../Asset/images/categories/PopularFoods.png";
 
 const CategoryBar = ({ selectedCategory, onCategorySelect, themeColors }) => {
   const scrollRef = useRef(null);
@@ -8,30 +7,42 @@ const CategoryBar = ({ selectedCategory, onCategorySelect, themeColors }) => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
+const importAll = (r) => {
+  let images = {};
+  r.keys().forEach((item) => {
+    const key = item.replace("./", "").replace(/\.(png|jpe?g|svg)$/, "");
+    images[key] = r(item);
+  });
+  return images;
+};
+
+// Import all images from the categories folder
+const categoryImages = importAll(require.context("../../Asset/images/categories", false, /\.(png|jpe?g|svg)$/));
+
 const categories = [
-  { id: "Popular Foods", name: "Popular Foods", icon: PopularFoods },
-  { id: "Salad", name: "Salad", icon: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png" },
-  { id: "Soups", name: "Soups", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917890.png" },
-  { id: "Fried Rice\n(KeeriSamba)", name: "Fried Rice\n(KeeriSamba)", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917891.png" },
-  { id: "Fried Rice\n(Basmathi)", name: "Fried Rice\n(Basmathi)", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917891.png" },
-  { id: "Seafood", name: "Seafood", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917892.png" },
-  { id: "Special", name: "Special", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917893.png" },
-  { id: "Fried Kottu", name: "Fried Kottu", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917894.png" },
-  { id: "Fried Noodles", name: "Fried Noodles", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917895.png" },
-  { id: "Chicken", name: "Chicken", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917896.png" },
-  { id: "Beef", name: "Beef", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917897.png" },
-  { id: "Fish Cuttlefish Prawns", name: "Cuttlefish,\nPrawns", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917898.png" },
-  { id: "Pasta", name: "Pasta", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917899.png" },
-  { id: "Dum Biryani", name: "Dum Biryani", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917900.png" },
-  { id: "Indian", name: "Indian", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917901.png" },
-  { id: "Submarine", name: "Submarine", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917902.png" },
-  { id: "Burger", name: "Burger", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917903.png" },
-  { id: "Sandwich", name: "Sandwich", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917904.png" },
-  { id: "Shawarma", name: "Shawarma", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917905.png" },
-  { id: "Fruit Juice", name: "Fruit Juice", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917906.png" },
-  { id: "Milkshake", name: "Milkshake", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917907.png" },
-  { id: "Beverages", name: "Beverages", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917908.png" },
-  { id: "Desserts", name: "Desserts", icon: "https://cdn-icons-png.flaticon.com/512/2917/2917909.png" },
+  { id: "Popular Foods", name: "Popular Foods", icon: categoryImages["1205049"] },
+  { id: "Salad", name: "Salad", icon: categoryImages["Salad"] },
+  { id: "Soups", name: "Soups", icon: categoryImages["Soups"] },
+  { id: "Fried Rice\n(KeeriSamba)", name: "Fried Rice\n(KeeriSamba)", icon: categoryImages["FriedRice"] },
+  { id: "Fried Rice\n(Basmathi)", name: "Fried Rice\n(Basmathi)", icon: categoryImages["FriedRice2"] },
+  { id: "Seafood", name: "Seafood", icon: categoryImages["Seafood"] },
+  { id: "Special", name: "Special", icon: categoryImages["Special"] },
+  { id: "Fried Kottu", name: "Fried Kottu", icon: categoryImages["FriedKottu"] },
+  { id: "Noodles", name: "Noodles", icon: categoryImages["noodles"] },
+  { id: "Chicken", name: "Chicken", icon: categoryImages["ChickenN"] },
+  { id: "Beef", name: "Beef", icon: categoryImages["Beef"] },
+  { id: "Fish Cuttlefish Prawns", name: "Cuttlefish,\nPrawns", icon: categoryImages["prawn"] },
+  { id: "Pasta", name: "Pasta", icon: categoryImages["Pasta"] },
+  { id: "Dum Biryani", name: "Dum Biryani", icon: categoryImages["biryani"] },
+  { id: "Indian", name: "Indian", icon: categoryImages["Indian"] },
+  { id: "Submarine", name: "Submarine", icon: categoryImages["Submarine"] },
+  { id: "Burger", name: "Burger", icon: categoryImages["burger"] },
+  { id: "Sandwich", name: "Sandwich", icon: categoryImages["sandwich"] },
+  { id: "Shawarma", name: "Shawarma", icon: categoryImages["Shawarma"] },
+  { id: "Fruit Juice", name: "Fruit Juice", icon: categoryImages["FruitJuice"] },
+  { id: "Milkshake", name: "Milkshake", icon: categoryImages["Milkshake"] },
+  { id: "Beverages", name: "Beverages", icon: categoryImages["Beverages"] },
+  { id: "Desserts", name: "Desserts", icon: categoryImages["Desserts"] },
 ];
 
 
@@ -65,7 +76,7 @@ const categories = [
         "&::-webkit-scrollbar": { display: "none" },
         cursor: isDragging ? "grabbing" : "grab",
         userSelect: "none",
-        backgroundColor: "#fff",
+        backgroundColor: "#fff5eb",
       }}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
