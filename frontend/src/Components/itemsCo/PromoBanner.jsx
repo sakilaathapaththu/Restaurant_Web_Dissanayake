@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -10,48 +10,54 @@ import {
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 // Import your local images
-import img1 from '../../Asset/images/img1.png';
+import img1 from '../../Asset/images/promo/itembanner1.png';
 import img2 from '../../Asset/images/promo/itembanner2.png';
+import img4 from '../../Asset/images/promo/itembanner4.png';
+import img3 from '../../Asset/images/promo/itembanner3.png';
 
-const PromoBanner = () => {
+const PromoBanner = ({ onCategorySelect }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const promoData = [
     {
       id: 1,
-      title: 'Just Celeste It!',
-      subtitle: 'Get your groceries at in-store prices, TCA',
+      title: 'Dissanayake Restaurant Special',
+      subtitle: 'Juicy, golden, perfectly spiced chicken.',
       buttonText: 'Order Now',
-      backgroundColor: '#06c16788', // overlay color for hover
+      backgroundColor: '#06c16788',
       textColor: 'white',
-      image: img1,
+      image: img3,
+      category: 'Chicken', 
     },
     {
       id: 2,
-      title: 'Shirohana blooms await! 🌸',
-      subtitle: 'Spend over Rs. 3,000 and get 20% off, TCA',
-      buttonText: 'Order Now',
+      title: 'A Bowl of Goodness',
+      subtitle: 'Freshly tossed salads with vibrant flavors.',
+      buttonText: 'Explore Salads',
       backgroundColor: '#f0f088',
-      textColor: '#000',
+      textColor: '#ffffffff',
       image: img2,
+      category: 'Salad',
     },
     {
       id: 3,
-      title: 'LKR 1,000 Off on Salary Week*',
-      subtitle: 'Salary week special!',
+      title: 'Sip the Freshness!',
+      subtitle: 'Hand-crafted juices made with real fruits.',
       buttonText: 'Order Now',
       backgroundColor: '#ff6b3588',
       textColor: 'white',
       image: img1,
+      category: 'Fruit Juice',
     },
     {
       id: 4,
-      title: 'Dissanayake Restaurant Special',
-      subtitle: 'Authentic Sri Lankan cuisine with 15% off',
-      buttonText: 'Order Now',
+      title: 'Brewed for You',
+      subtitle: 'Rich, bold coffee made to energize your day.',
+      buttonText: 'Grab a Cup',
       backgroundColor: '#1976d288',
       textColor: 'white',
-      image: '/api/placeholder/150/100',
+      image: img4,
+      category: 'Beverages',
     },
   ];
 
@@ -59,11 +65,6 @@ const PromoBanner = () => {
     setCurrentSlide((prev) => (prev + 1) % promoData.length);
   const prevSlide = () =>
     setCurrentSlide((prev) => (prev - 1 + promoData.length) % promoData.length);
-
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 6000); // 5 sec auto slide
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <Box sx={{ px: 2, py: 2 }}>
@@ -80,7 +81,7 @@ const PromoBanner = () => {
               key={promo.id}
               sx={{
                 minWidth: '100%',
-                height: { xs: 160, md: 260 },
+                height: { xs: 130, md: 260 },
                 position: 'relative',
                 borderRadius: 2,
                 color: promo.textColor,
@@ -91,7 +92,7 @@ const PromoBanner = () => {
                 overflow: 'hidden',
               }}
             >
-              {/* Overlay behind content */}
+              {/* Overlay */}
               <Box
                 sx={{
                   position: 'absolute',
@@ -100,7 +101,7 @@ const PromoBanner = () => {
                   width: '100%',
                   height: '100%',
                   borderRadius: 2,
-                  backgroundColor: 'rgba(25, 25, 25, 0.23)', // initial overlay
+                  backgroundColor: 'rgba(25, 25, 25, 0.23)',
                   transition: '0.3s',
                   zIndex: 1,
                   '&:hover': {
@@ -110,17 +111,17 @@ const PromoBanner = () => {
                 }}
               />
 
-              {/* CardContent */}
+              {/* Content */}
               <CardContent
                 sx={{
                   position: 'relative',
-                  zIndex: 2, // ensure content is above overlay
+                  zIndex: 2,
                   display: 'flex',
                   flexDirection: { xs: 'column', md: 'row' },
                   justifyContent: { xs: 'flex-start', md: 'space-between' },
                   alignItems: { xs: 'flex-start', md: 'center' },
                   height: { xs: 'auto', md: '100%' },
-                  p: { xs: 4, md: 4 },
+                  p: { xs: 2, md: 4 },
                   pl: { xs: 3, md: 6 },
                   gap: { xs: 1, md: 0 },
                 }}
@@ -140,6 +141,7 @@ const PromoBanner = () => {
                   </Typography>
                   <Button
                     variant="contained"
+                    onClick={() => onCategorySelect(promo.category)} 
                     sx={{
                       color: 'white',
                       borderRadius: 2,
@@ -161,7 +163,7 @@ const PromoBanner = () => {
           ))}
         </Box>
 
-        {/* Navigation Arrows */}
+        {/* Arrows */}
         <IconButton
           onClick={prevSlide}
           sx={{
@@ -189,7 +191,7 @@ const PromoBanner = () => {
           <ChevronRight />
         </IconButton>
 
-        {/* Dots Indicator */}
+        {/* Dots */}
         <Box
           sx={{
             position: 'absolute',
@@ -216,13 +218,6 @@ const PromoBanner = () => {
           ))}
         </Box>
       </Box>
-
-      <Typography variant="body2" sx={{ mt: 1, color: '#666', fontSize: 12 }}>
-        Additional fees may apply.{' '}
-        <Button sx={{ p: 0, textTransform: 'none', fontSize: 12 }}>
-          Learn more
-        </Button>
-      </Typography>
     </Box>
   );
 };

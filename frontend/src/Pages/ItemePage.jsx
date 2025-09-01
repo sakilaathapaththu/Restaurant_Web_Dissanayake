@@ -179,7 +179,7 @@ const ItemsPage = () => {
           </Box>
         )}
 
-        <PromoBanner themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }} />
+       <PromoBanner onCategorySelect={setSelectedCategory} />
 
         {/*  CategoryBar inserted here */}
         <CategoryBar
