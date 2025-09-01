@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import {
   Box,
   Card,
@@ -65,6 +65,12 @@ const PromoBanner = ({ onCategorySelect }) => {
     setCurrentSlide((prev) => (prev + 1) % promoData.length);
   const prevSlide = () =>
     setCurrentSlide((prev) => (prev - 1 + promoData.length) % promoData.length);
+
+    // Auto-slide every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <Box sx={{ px: 2, py: 2 }}>
