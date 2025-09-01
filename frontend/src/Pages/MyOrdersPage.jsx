@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import orderService from '../services/orderService';
 import cartService from '../services/cartService';
 import Homepagenavbar from '../Components/Navbar/Homepagenavbar';
+import Footer from "../Components/Home/Footer";
 import Logo from '../Asset/images/mobile logo.png';
 import jsPDF from 'jspdf';
 
@@ -243,6 +244,7 @@ const getBase64Image = (url) => {
 
   if (loading && orders.length === 0) {
     return (
+     
       <Box sx={{ backgroundColor: '#FFF3E8', minHeight: '100vh' }}>
         <Homepagenavbar />
         <Box sx={{ px: 2, py: 4 }}>
@@ -255,6 +257,7 @@ const getBase64Image = (url) => {
   }
 
   return (
+     <>
     <Box sx={{ backgroundColor: '#FFF3E8', minHeight: '100vh' }}>
       <Homepagenavbar />
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -444,6 +447,9 @@ const getBase64Image = (url) => {
         )}
       </Container>
     </Box>
+
+  <Footer />
+</>
   );
 };
 
