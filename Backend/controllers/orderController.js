@@ -1,9 +1,9 @@
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 
-const { sendOrderConfirmed } = require('../services/whatsapp');
+// const { sendText, normalizeSriPhone } = require("../services/whatsapp");
 
-
+const { sendOrderConfirmation } = require('../services/whatsapp');
 // Create a new order from cart
 const createOrder = async (req, res) => {
     try {
@@ -242,70 +242,79 @@ const getOrderById = async (req, res) => {
 //     }
 // };
 
-// Update order status (admin)
+
+
 const updateOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.params;
-    const { status, estimatedDeliveryTime, pickupTime } = req.body; // ⬅️ pickupTime added
+    // accept either :orderId or :id
+    const { orderId, id } = req.params;
+    const theId = orderId || id;
 
+    const { status, estimatedDeliveryTime, pickupTime } = req.body;
     if (!status) {
-      return res.status(400).json({
-        success: false,
-        message: 'Status is required'
-      });
+      return res.status(400).json({ success: false, message: 'Status is required' });
     }
 
-    // Build the update payload
+    // Build update payload (keeps your previous behavior)
     const updateData = { status };
     if (estimatedDeliveryTime) updateData.estimatedDeliveryTime = estimatedDeliveryTime;
-    if (pickupTime) updateData.pickupTime = pickupTime; // ⬅️ persist pickup time (string like "15:30" or ISO)
+    if (pickupTime) updateData.pickupTime = pickupTime;
 
-    // Set actual delivery time if status is delivered
     if (status === 'delivered') {
       updateData.actualDeliveryTime = new Date();
     }
 
     const order = await Order.findByIdAndUpdate(
-      orderId,
+      theId,
       updateData,
       { new: true, runValidators: true }
     ).populate('items.foodId', 'name image');
 
     if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: 'Order not found'
-      });
+      return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // ✅ Send WhatsApp only when the order is confirmed
-try {
-  if (order.status === 'confirmed' && order.customerPhone) {
-    await sendOrderConfirmed(order); // uses your services/whatsapp.js helper
+    // WhatsApp on confirm
+    let whatsapp = { sent: false };
+    // if (order.status === 'confirmed' && order.customerPhone) {
+    //   try {
+    //     await sendOrderConfirmation({
+    //       phone: order.customerPhone,
+    //       orderId: order._id,
+    //       pickupTime: order.pickupTime || pickupTime,
+    //     });
+    //     whatsapp = { sent: true };
+    //   } catch (waErr) {
+    //     console.error('WhatsApp send failed:', waErr?.message || waErr);
+    //     whatsapp = { sent: false, error: String(waErr?.message || waErr) };
+    //   }
+    // }
+    if (order.status === 'confirmed' && order.customerPhone) {
+  try {
+    await sendOrderConfirmation(order);   // ← pass full order
+    whatsapp = { sent: true };
+  } catch (waErr) {
+    console.error('WhatsApp send failed:', waErr?.message || waErr);
+    whatsapp = { sent: false, error: String(waErr?.message || waErr) };
   }
-} catch (waErr) {
-  console.error('WhatsApp send failed:', waErr); // keep API success even if WA fails
 }
 
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'Order status updated successfully',
-      data: order
+      data: order,
+      whatsapp, // frontend can check this
     });
 
   } catch (error) {
     console.error('Error updating order status:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Internal server error',
-      error: error.message
+      error: error.message,
     });
   }
 };
-
-
-
 
 // Cancel order
 // Fixed cancel order function
