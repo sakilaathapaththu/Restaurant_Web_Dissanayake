@@ -21,8 +21,9 @@ import orderService from "../services/orderService";
 import cartService from "../services/cartService";
 import HomepageNavbar from "../Components/Navbar/Homepagenavbar";
 import InputAdornment from "@mui/material/InputAdornment";
-
+import Footer from "../Components/Home/Footer";
 const toSriLankaMSISDN = (nineDigits) => `94${nineDigits}`;
+
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -111,6 +112,33 @@ const handleSubmit = async (e) => {
       customerPhone: toSriLankaMSISDN(formData.customerPhone),
     };
 
+
+    const grandTotal = totalAmount;
+
+    if (items.length === 0) return null;
+
+    return (
+        <>
+        <Box sx={{
+            minHeight: '100vh',
+            backgroundColor: '#FFF3E8',
+            py: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        }}>
+            <HomepageNavbar />
+            <Container maxWidth="xl" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Header */}
+                <Box sx={{ textAlign: 'center', mb: 5 }}>
+                    <Typography variant="h3" sx={{ fontWeight: 700, color: '#2c1000', mb: 1 }}>
+                        Complete Your Order
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: '#2c1000', fontWeight: 400 }}>
+                        Review your items and provide details
+                    </Typography>
+                </Box>
+
     const response = await orderService.createOrder(orderData);
     if (response.success) {
       setSuccess("Order placed successfully!");
@@ -123,6 +151,7 @@ const handleSubmit = async (e) => {
     setLoading(false);
   }
 };
+
 
   const grandTotal = totalAmount;
 
@@ -470,9 +499,15 @@ const handleSubmit = async (e) => {
             </Paper>
           </Box>
         </Box>
+
+        <Footer />
+    </>
+    );
+
       </Container>
     </Box>
   );
+
 };
 
 export default CheckoutPage;
