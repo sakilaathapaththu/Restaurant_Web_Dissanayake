@@ -6,6 +6,7 @@ import SearchBar from '../Components/itemsCo/SearchBar';
 import PromoBanner from '../Components/itemsCo/PromoBanner';
 import FoodSection from '../Components/itemsCo/FoodSection';
 import CategoryBar from '../Components/itemsCo/CategoryBar';
+import Footer from "../Components/Home/Footer";
 import API from '../Utils/api';
 import fallbackImage from '../Asset/images/foods/chicken-fried-rice.jpg';
 
@@ -226,7 +227,9 @@ const ItemsPage = () => {
           </Box>
         )}
       </Box>
+      <Footer /> 
     </>
+    
   );
 };
 
