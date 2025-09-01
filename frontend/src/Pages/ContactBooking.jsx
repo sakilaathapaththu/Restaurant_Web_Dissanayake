@@ -48,10 +48,41 @@ export default function ContactBooking() {
   const [err, setErr] = React.useState("");
   const [mounted, setMounted] = React.useState(false);
 
+  // ✅ UPDATED: Enhanced useEffect with mobile zoom fix
   React.useEffect(() => {
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
     setMounted(true);
+
+    // Handle mobile zoom reset after input blur
+    const handleBlur = () => {
+      // Small delay to ensure the browser has time to process the blur
+      setTimeout(() => {
+        if (window.visualViewport) {
+          // Force viewport reset if available
+          window.scrollTo(0, window.pageYOffset);
+        }
+        // Alternative method for older browsers
+        const metaViewport = document.querySelector('meta[name=viewport]');
+        if (metaViewport) {
+          const content = metaViewport.getAttribute('content');
+          metaViewport.setAttribute('content', content);
+        }
+      }, 100);
+    };
+
+    // Add event listeners to all form inputs
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+      input.addEventListener('blur', handleBlur);
+    });
+
+    // Cleanup
+    return () => {
+      inputs.forEach(input => {
+        input.removeEventListener('blur', handleBlur);
+      });
+    };
   }, []);
 
   const isBooking = form.type !== "question";
@@ -123,6 +154,7 @@ export default function ContactBooking() {
     }
   };
 
+  // ✅ UPDATED: Fixed font sizes to prevent mobile zoom
   const inputStyles = {
     '& .MuiOutlinedInput-root': {
       borderRadius: 1,
@@ -135,10 +167,10 @@ export default function ContactBooking() {
       }
     },
     '& .MuiInputLabel-root': {
-      fontSize: { xs: '0.875rem', md: '1rem' }
+      fontSize: { xs: '1rem', md: '1rem' }
     },
     '& .MuiOutlinedInput-input': {
-      fontSize: { xs: '0.875rem', md: '1rem' }
+      fontSize: { xs: '1rem', md: '1rem' }
     }
   };
 
@@ -331,7 +363,7 @@ export default function ContactBooking() {
                             sx={{
                               ...inputStyles,
                               '& .MuiFormHelperText-root': {
-                                fontSize: { xs: '0.75rem', md: '0.75rem' }
+                                fontSize: { xs: '0.875rem', md: '0.875rem' }
                               }
                             }}
                           />
@@ -745,3 +777,4 @@ export default function ContactBooking() {
     </Box>
   );
 }
+        
