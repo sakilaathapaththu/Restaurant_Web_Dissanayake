@@ -20,6 +20,7 @@ import { useCart } from '../context/CartContext';
 import orderService from '../services/orderService';
 import cartService from '../services/cartService';
 import HomepageNavbar from '../Components/Navbar/Homepagenavbar';
+import Footer from "../Components/Home/Footer";
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -74,6 +75,7 @@ const CheckoutPage = () => {
     if (items.length === 0) return null;
 
     return (
+        <>
         <Box sx={{
             minHeight: '100vh',
             backgroundColor: '#FFF3E8',
@@ -205,6 +207,8 @@ const CheckoutPage = () => {
                 </Box>
             </Container>
         </Box>
+        <Footer />
+    </>
     );
 };
 

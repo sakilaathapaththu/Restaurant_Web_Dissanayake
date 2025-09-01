@@ -6,6 +6,7 @@ import SearchBar from '../Components/itemsCo/SearchBar';
 import PromoBanner from '../Components/itemsCo/PromoBanner';
 import FoodSection from '../Components/itemsCo/FoodSection';
 import CategoryBar from '../Components/itemsCo/CategoryBar';
+import Footer from "../Components/Home/Footer";
 import API from '../Utils/api';
 import fallbackImage from '../Asset/images/foods/chicken-fried-rice.jpg';
 
@@ -57,8 +58,8 @@ const ItemsPage = () => {
               portions: item.portions || [],
               priceValue: priceValue,
               originalPrice: priceValue,
-              rating: 4.5,
-              reviewCount: 150,
+              rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
+              reviewCount: Math.floor(Math.random() * (256 - 120 + 1)) + 120,
               deliveryFee: 0,
               categories,
               distance: 2.5,
@@ -158,7 +159,7 @@ const ItemsPage = () => {
   return (
     <>
       <Homepagenavbar />
-      <Box sx={{ py: 3, backgroundColor: '#fff5eb' }}>
+      <Box sx={{ py: 3, backgroundColor: '#fff5eb' , px: { xs: 0, sm: 4, md: 12, lg: 22 } }}>
         <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
 
         {hasActiveFilters && (
@@ -179,7 +180,7 @@ const ItemsPage = () => {
           </Box>
         )}
 
-        <PromoBanner themeColors={{ primary: '#2c1000', secondary: '#e8d5c4', accent: '#fda021' }} />
+       <PromoBanner onCategorySelect={setSelectedCategory} />
 
         {/*  CategoryBar inserted here */}
         <CategoryBar
@@ -226,7 +227,9 @@ const ItemsPage = () => {
           </Box>
         )}
       </Box>
+      <Footer /> 
     </>
+    
   );
 };
 
