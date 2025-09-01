@@ -158,7 +158,7 @@ const ItemsPage = () => {
   return (
     <>
       <Homepagenavbar />
-      <Box sx={{ py: 3, backgroundColor: '#fff5eb' }}>
+      <Box sx={{ py: 3, backgroundColor: '#fff5eb' , px: { xs: 0, sm: 4, md: 12, lg: 22 } }}>
         <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
 
         {hasActiveFilters && (
