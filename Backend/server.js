@@ -51,6 +51,7 @@ app.use('/api/orders', orderRoutes);
 // health
 app.get("/", (_req, res) => res.json({ ok: true }));
 
+app.use("/api/otp", require("./routes/otpRoutes"));
 
 // ✅ NEW: JSON error handler (keep last)
 app.use((err, _req, res, _next) => {
