@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Chip } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { Clear as ClearIcon } from '@mui/icons-material';
 import Homepagenavbar from '../Components/Navbar/Homepagenavbar';
 import SearchBar from '../Components/itemsCo/SearchBar';
@@ -10,15 +10,9 @@ import Footer from "../Components/Home/Footer";
 import API from '../Utils/api';
 import fallbackImage from '../Asset/images/foods/chicken-fried-rice.jpg';
 
-const categoryOrder = [
-  'Popular Foods', 'Salad', 'Soups', 'Starters', 'Appetizer', 'Fried Rice (Keeri Samba)',
-  'Fried Rice (Basmathi)', 'Meat, Poultry & Seafood', 'Special', 'Fried Kottu', 'Fried Noodles',
-  'Chicken', 'Beef', 'Fish , Cuttlefish, Prawns', 'Pasta', 'Dum Biryani', 'Indian', 'Submarine',
-  'Burger', 'Sandwich', 'Shawarma', 'Fruit Juice', 'Milkshake', 'Beverages', 'Desserts'
-];
-
 const ItemsPage = () => {
   const [backendFoods, setBackendFoods] = useState([]);
+  const [dynamicCategories, setDynamicCategories] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
@@ -75,10 +69,17 @@ const ItemsPage = () => {
           });
 
           setBackendFoods(transformedFoods);
+
+
+          const uniqueCategories = [
+            ...new Set(transformedFoods.flatMap(food => food.categories))
+          ];
+          setDynamicCategories(['Popular Foods', ...uniqueCategories]);
         }
       } catch (err) {
         console.error("Error fetching menu items:", err);
         setBackendFoods([]);
+        setDynamicCategories([]);
       } finally {
         setLoading(false);
       }
@@ -100,18 +101,13 @@ const ItemsPage = () => {
 
     if (filters.offers) filtered = filtered.filter(food => food.offer !== null);
     if (filters.deliveryFee) filtered = filtered.filter(food => food.deliveryFee === 0);
-    if (filters.under30min) {
-      filtered = filtered.filter(food => parseInt(food.deliveryTime.match(/\d+/)?.[0] || '30') <= 30);
-    }
+    if (filters.under30min) filtered = filtered.filter(food => parseInt(food.deliveryTime.match(/\d+/)?.[0] || '30') <= 30);
     if (filters.rating) filtered = filtered.filter(food => food.rating >= minRating);
     if (filters.price) filtered = filtered.filter(food => food.price >= priceRange[0] && food.price <= priceRange[1]);
-    if (dietaryFilter) {
-      filtered = filtered.filter(food =>
-        food.categories.some(cat => cat.toLowerCase().includes(dietaryFilter.toLowerCase()))
-      );
-    }
+    if (dietaryFilter) filtered = filtered.filter(food =>
+      food.categories.some(cat => cat.toLowerCase().includes(dietaryFilter.toLowerCase()))
+    );
 
-    // Apply category filter
     if (selectedCategory !== "All") {
       filtered = filtered.filter(food =>
         selectedCategory === "Popular Foods"
@@ -120,12 +116,10 @@ const ItemsPage = () => {
       );
     }
 
-    // Sorting
     switch (filters.sort) {
       case 'rating': filtered.sort((a, b) => b.rating - a.rating); break;
       case 'delivery_time': filtered.sort((a, b) =>
-        parseInt(a.deliveryTime.match(/\d+/)?.[0] || '30') -
-        parseInt(b.deliveryTime.match(/\d+/)?.[0] || '30')
+        parseInt(a.deliveryTime.match(/\d+/)?.[0] || '30') - parseInt(b.deliveryTime.match(/\d+/)?.[0] || '30')
       ); break;
       case 'distance': filtered.sort((a, b) => a.distance - b.distance); break;
       case 'price_low_high': filtered.sort((a, b) => a.price - b.price); break;
@@ -180,42 +174,30 @@ const ItemsPage = () => {
           </Box>
         )}
 
-       <PromoBanner onCategorySelect={setSelectedCategory} />
+        <PromoBanner onCategorySelect={setSelectedCategory} />
 
         {/*  CategoryBar inserted here */}
         <CategoryBar
-          categories={["All", ...categoryOrder]}
+          categories={["All", ...dynamicCategories]} 
           selectedCategory={selectedCategory}
           onCategorySelect={setSelectedCategory}
           themeColors={{ primary: "#2c1000", secondary: "#ffffffff", accent: "#fda021" }}
         />
 
         {/* Render Foods */}
-        {selectedCategory === "All"
-          ? categoryOrder.map((categoryName) => {
-              const foodsInCategory = filteredFoods.filter(food =>
-                categoryName === "Popular Foods"
-                  ? food.isPopular
-                  : food.categories.some(cat => cat.toLowerCase() === categoryName.toLowerCase())
-              );
-              return foodsInCategory.length > 0 ? (
-                <FoodSection
-                  key={categoryName}
-                  title={categoryName}
-                  foods={foodsInCategory}
-                  themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
-                />
-              ) : null;
-            })
-          : (
-            <FoodSection
-              title={selectedCategory}
-              foods={filteredFoods}
-              themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
-            />
-          )
-        }
-
+{(selectedCategory === "All" ? dynamicCategories : [selectedCategory]).map(categoryName => {
+  const foodsInCategory = filteredFoods.filter(food =>
+    food.categories.some(cat => cat.toLowerCase() === categoryName.toLowerCase())
+  );
+  return foodsInCategory.length > 0 ? (
+    <FoodSection
+      key={categoryName}
+      title={categoryName}
+      foods={foodsInCategory}
+      themeColors={{ primary: "#2c1000", secondary: "#e8d5c4", accent: "#fda021" }}
+    />
+  ) : null;
+})}
         {loading && <FoodSection title="Loading..." foods={[]} />}
 
         {!loading && filteredFoods.length === 0 && backendFoods.length > 0 && (
@@ -229,7 +211,6 @@ const ItemsPage = () => {
       </Box>
       <Footer /> 
     </>
-    
   );
 };
 
