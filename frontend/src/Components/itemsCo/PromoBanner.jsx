@@ -21,7 +21,7 @@ const PromoBanner = ({ onCategorySelect }) => {
   const promoData = [
     {
       id: 1,
-      title: 'Dissanayake Restaurant Special',
+      title: 'Dissanayake Restaurant',
       subtitle: 'Juicy, golden, perfectly spiced chicken.',
       buttonText: 'Order Now',
       backgroundColor: '#06c16788',
