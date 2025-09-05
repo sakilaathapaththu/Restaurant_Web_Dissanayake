@@ -97,15 +97,19 @@ export default function ContactBooking() {
     } else if (name === "phone") {
       processedValue = normalizePhone(value);
     } else {
-      // Ensure value is always a string
+      // Ensure value is always a string, handle null/undefined
       processedValue = value === null || value === undefined ? "" : String(value);
     }
     
-    setForm((f) => ({
-      ...f,
+    setForm((prevForm) => ({
+      ...prevForm,
       [name]: processedValue,
     }));
-    setErr("");
+    
+    // Clear errors when user starts typing
+    if (err) {
+      setErr("");
+    }
   };
 
   const validate = () => {
@@ -123,9 +127,15 @@ export default function ContactBooking() {
     return "";
   };
 
+  // ✅ ENHANCED: Complete form reset with force re-render
   const resetAfterSuccess = () => {
-    setForm((f) => ({
-      ...f,
+    // Force immediate state update
+    setForm((prevForm) => ({
+      type: "question",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
       date: "",
       time: "",
       guests: "",
@@ -134,17 +144,42 @@ export default function ContactBooking() {
       message: "",
       agreeToPolicy: false,
     }));
+    
+    // Clear any existing errors
+    setErr("");
+    
+    // Force DOM form reset as backup
+    setTimeout(() => {
+      const formElement = document.querySelector('form');
+      if (formElement) {
+        // Reset form but preserve our controlled state
+        const inputs = formElement.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+          if (input.type === 'checkbox') {
+            input.checked = false;
+          } else if (input.type !== 'submit' && input.type !== 'button') {
+            input.value = '';
+          }
+        });
+      }
+    }, 100);
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
     const msg = validate();
-    if (msg) { setErr(msg); return; }
+    if (msg) { 
+      setErr(msg); 
+      return; 
+    }
 
     setLoading(true);
+    setErr(""); // Clear any existing errors
+    
     try {
       await API.post("/inquiries", form);
       setOk("Thank you! We'll contact you shortly to confirm your request.");
+      // Reset form after successful submission
       resetAfterSuccess();
     } catch (error) {
       const apiErr = error?.response?.data?.error;
@@ -154,11 +189,12 @@ export default function ContactBooking() {
     }
   };
 
-  // ✅ UPDATED: Fixed font sizes to prevent mobile zoom
+  // ✅ ENHANCED: Better mobile input styles
   const inputStyles = {
     '& .MuiOutlinedInput-root': {
       borderRadius: 1,
       backgroundColor: 'white',
+      width: '100%',
       '&:hover fieldset': {
         borderColor: '#fda021',
       },
@@ -170,7 +206,25 @@ export default function ContactBooking() {
       fontSize: { xs: '1rem', md: '1rem' }
     },
     '& .MuiOutlinedInput-input': {
-      fontSize: { xs: '1rem', md: '1rem' }
+      fontSize: { xs: '1rem', md: '1rem' },
+      padding: { xs: '14px 16px', md: '14px 16px' }
+    },
+    '& .MuiInputBase-root': {
+      width: '100%'
+    },
+    width: '100%'
+  };
+
+  // ✅ ENHANCED: Special styles for date/time inputs
+  const dateTimeInputStyles = {
+    ...inputStyles,
+    '& .MuiOutlinedInput-input': {
+      fontSize: { xs: '1rem', md: '1rem' },
+      padding: { xs: '16px 14px', md: '16px 14px' },
+      minHeight: { xs: '24px', md: '20px' }
+    },
+    '& .MuiInputAdornment-root': {
+      marginRight: '8px'
     }
   };
 
@@ -253,6 +307,7 @@ export default function ContactBooking() {
                   position: 'relative',
                   overflow: 'visible',
                   height: 'fit-content',
+                  width: '100%',
                   '&::before': {
                     content: '""',
                     position: 'absolute',
@@ -287,18 +342,18 @@ export default function ContactBooking() {
                   </Typography>
                 </Box>
 
-                <CardContent sx={{ p: { xs: 2, md: 3 } }} component="form" onSubmit={onSubmit}>
-                  <Stack spacing={2.5}>
+                <CardContent sx={{ p: { xs: 2, md: 3 }, width: '100%', boxSizing: 'border-box' }} component="form" onSubmit={onSubmit}>
+                  <Stack spacing={2.5} sx={{ width: '100%' }}>
                     {/* Request Type */}
                     <TextField
                       select
                       fullWidth
                       label="How can we help you?"
                       name="type"
-                      value={form.type || ""}
+                      value={form.type}
                       onChange={onChange}
                       required
-                      size="small"
+                      size="medium"
                       sx={inputStyles}
                     >
                       {TYPES.map((t) => (
@@ -307,56 +362,56 @@ export default function ContactBooking() {
                     </TextField>
 
                     {/* Personal Information */}
-                    <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, bgcolor: '#fefcf8', borderRadius: 1 }}>
+                    <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, bgcolor: '#fefcf8', borderRadius: 1, width: '100%', boxSizing: 'border-box' }}>
                       <Typography variant="h6" gutterBottom sx={{ color: '#2c1000', mb: 2, fontSize: { xs: '1rem', md: '1.125rem' } }}>
                         Personal Information
                       </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
+                      <Grid container spacing={2} sx={{ width: '100%', margin: 0 }}>
+                        <Grid item xs={12} sm={6} sx={{ paddingLeft: { xs: '0 !important', sm: '16px !important' }, paddingTop: { xs: '16px !important' } }}>
                           <TextField
                             label="First Name"
                             name="firstName"
-                            value={form.firstName || ""}
+                            value={form.firstName}
                             onChange={onChange}
                             fullWidth
                             required
-                            size="small"
+                            size="medium"
                             sx={inputStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} sx={{ paddingLeft: { xs: '0 !important', sm: '16px !important' }, paddingTop: { xs: '16px !important' } }}>
                           <TextField
                             label="Last Name (Optional)"
                             name="lastName"
-                            value={form.lastName || ""}
+                            value={form.lastName}
                             onChange={onChange}
                             fullWidth
-                            size="small"
+                            size="medium"
                             sx={inputStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} sx={{ paddingLeft: { xs: '0 !important', sm: '16px !important' }, paddingTop: '16px !important' }}>
                           <TextField
                             label="Email (Optional)"
                             name="email"
                             type="email"
-                            value={form.email || ""}
+                            value={form.email}
                             onChange={onChange}
                             fullWidth
-                            size="small"
+                            size="medium"
                             placeholder="you@example.com"
                             sx={inputStyles}
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12} sm={6} sx={{ paddingLeft: { xs: '0 !important', sm: '16px !important' }, paddingTop: '16px !important' }}>
                           <TextField
                             label="Phone Number"
                             name="phone"
-                            value={form.phone || ""}
+                            value={form.phone}
                             onChange={onChange}
                             fullWidth
                             required
-                            size="small"
+                            size="medium"
                             placeholder="9477XXXXXXX"
                             helperText="International format (e.g., 9477XXXXXXX)"
                             inputProps={{ inputMode: "numeric", pattern: "\\d*" }}
@@ -374,12 +429,12 @@ export default function ContactBooking() {
                     {/* Booking Details */}
                     {isBooking && (
                       <Fade in={isBooking} timeout={500}>
-                        <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, bgcolor: '#fff8f0', borderRadius: 1 }}>
+                        <Paper elevation={0} sx={{ p: { xs: 2, md: 2.5 }, bgcolor: '#fff8f0', borderRadius: 1, width: '100%', boxSizing: 'border-box' }}>
                           <Typography variant="h6" gutterBottom sx={{ color: '#2c1000', mb: 2, fontSize: { xs: '1rem', md: '1.125rem' } }}>
                             Reservation Details
                           </Typography>
-                          <Grid container spacing={2}>
-                            <Grid item xs={12} sm={4}>
+                          <Grid container spacing={2} sx={{ width: '100%', margin: 0 }}>
+                            <Grid item xs={12} sm={6} sx={{ paddingLeft: { xs: '0 !important', sm: '16px !important' }, paddingTop: { xs: '16px !important' } }}>
                               <TextField
                                 label="Date"
                                 name="date"
@@ -387,16 +442,16 @@ export default function ContactBooking() {
                                 value={form.date || ""}
                                 onChange={onChange}
                                 fullWidth
-                                size="small"
+                                size="medium"
                                 InputLabelProps={{ shrink: true }}
                                 required
                                 InputProps={{
-                                  startAdornment: <CalendarToday sx={{ mr: 1, color: '#fda021', fontSize: '1rem' }} />
+                                  startAdornment: <CalendarToday sx={{ mr: 1, color: '#fda021', fontSize: '1.2rem' }} />
                                 }}
-                                sx={inputStyles}
+                                sx={dateTimeInputStyles}
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sm={6} sx={{ paddingLeft: { xs: '0 !important', sm: '16px !important' }, paddingTop: { xs: '16px !important' } }}>
                               <TextField
                                 label="Time"
                                 name="time"
@@ -404,16 +459,16 @@ export default function ContactBooking() {
                                 value={form.time || ""}
                                 onChange={onChange}
                                 fullWidth
-                                size="small"
+                                size="medium"
                                 InputLabelProps={{ shrink: true }}
                                 required
                                 InputProps={{
-                                  startAdornment: <AccessTime sx={{ mr: 1, color: '#fda021', fontSize: '1rem' }} />
+                                  startAdornment: <AccessTime sx={{ mr: 1, color: '#fda021', fontSize: '1.2rem' }} />
                                 }}
-                                sx={inputStyles}
+                                sx={dateTimeInputStyles}
                               />
                             </Grid>
-                            <Grid item xs={12} sm={4}>
+                            <Grid item xs={12} sx={{ paddingLeft: '0 !important', paddingTop: '16px !important' }}>
                               <TextField
                                 label="Number of Guests"
                                 name="guests"
@@ -421,35 +476,35 @@ export default function ContactBooking() {
                                 value={form.guests || ""}
                                 onChange={onChange}
                                 fullWidth
-                                size="small"
+                                size="medium"
                                 inputProps={{ min: 1 }}
                                 required
                                 InputProps={{
-                                  startAdornment: <People sx={{ mr: 1, color: '#fda021', fontSize: '1rem' }} />
+                                  startAdornment: <People sx={{ mr: 1, color: '#fda021', fontSize: '1.2rem' }} />
                                 }}
                                 sx={inputStyles}
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sx={{ paddingLeft: '0 !important', paddingTop: '16px !important' }}>
                               <TextField
                                 label="Special Occasion (Optional)"
                                 name="occasion"
                                 value={form.occasion || ""}
                                 onChange={onChange}
                                 fullWidth
-                                size="small"
+                                size="medium"
                                 placeholder="Birthday, Anniversary, Corporate..."
                                 sx={inputStyles}
                               />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sx={{ paddingLeft: '0 !important', paddingTop: '16px !important' }}>
                               <TextField
                                 label="Budget Range (Optional)"
                                 name="budgetRange"
                                 value={form.budgetRange || ""}
                                 onChange={onChange}
                                 fullWidth
-                                size="small"
+                                size="medium"
                                 placeholder="e.g., LKR 20,000 – 50,000"
                                 sx={inputStyles}
                               />
@@ -467,17 +522,24 @@ export default function ContactBooking() {
                       onChange={onChange}
                       fullWidth
                       multiline
-                      rows={3}
+                      rows={4}
                       required
+                      size="medium"
                       placeholder={
                         isBooking
                           ? "Share any special requests, dietary requirements, or details about your reservation..."
                           : "Tell us about your inquiry or how we can help you..."
                       }
                       InputProps={{
-                        startAdornment: <Message sx={{ mr: 1, color: '#fda021', alignSelf: 'flex-start', mt: 1, fontSize: '1rem' }} />
+                        startAdornment: <Message sx={{ mr: 1, color: '#fda021', alignSelf: 'flex-start', mt: 1, fontSize: '1.2rem' }} />
                       }}
-                      sx={inputStyles}
+                      sx={{
+                        ...inputStyles,
+                        '& .MuiOutlinedInput-input': {
+                          fontSize: { xs: '1rem', md: '1rem' },
+                          padding: { xs: '16px 14px', md: '16px 14px' }
+                        }
+                      }}
                     />
 
                     {/* Privacy Policy */}
@@ -487,7 +549,7 @@ export default function ContactBooking() {
                           name="agreeToPolicy"
                           checked={form.agreeToPolicy || false}
                           onChange={onChange}
-                          size="small"
+                          size="medium"
                           sx={{
                             color: '#fda021',
                             '&.Mui-checked': {
@@ -497,7 +559,7 @@ export default function ContactBooking() {
                         />
                       }
                       label={
-                        <Typography variant="body2" sx={{ color: '#2c1000', fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
+                        <Typography variant="body2" sx={{ color: '#2c1000', fontSize: { xs: '0.9rem', md: '0.875rem' } }}>
                           I agree to the{" "}
                           <Button 
                             href="/privacy" 
@@ -505,7 +567,7 @@ export default function ContactBooking() {
                             sx={{ 
                               color: '#fda021', 
                               textDecoration: 'underline',
-                              fontSize: { xs: '0.8rem', md: '0.875rem' },
+                              fontSize: { xs: '0.9rem', md: '0.875rem' },
                               minWidth: 'auto',
                               p: 0,
                               '&:hover': { color: '#2c1000' }
@@ -524,7 +586,7 @@ export default function ContactBooking() {
                           severity="error" 
                           sx={{ 
                             borderRadius: 1,
-                            fontSize: { xs: '0.8rem', md: '0.875rem' },
+                            fontSize: { xs: '0.9rem', md: '0.875rem' },
                             '& .MuiAlert-icon': {
                               color: '#d32f2f'
                             }
@@ -544,12 +606,13 @@ export default function ContactBooking() {
                       fullWidth
                       sx={{
                         bgcolor: '#2c1000',
-                        py: { xs: 1.2, md: 1.5 },
+                        py: { xs: 1.5, md: 1.5 },
                         borderRadius: 2,
-                        fontSize: { xs: '0.9rem', md: '1rem' },
+                        fontSize: { xs: '1rem', md: '1rem' },
                         fontWeight: 600,
                         textTransform: 'none',
                         boxShadow: '0 4px 20px rgba(44, 16, 0, 0.3)',
+                        minHeight: { xs: '48px', md: '52px' },
                         '&:hover': {
                           bgcolor: '#4a2000',
                           boxShadow: '0 6px 25px rgba(44, 16, 0, 0.4)',
@@ -565,7 +628,7 @@ export default function ContactBooking() {
                       variant="caption" 
                       color="text.secondary" 
                       textAlign="center"
-                      sx={{ mt: 2, fontSize: { xs: '0.7rem', md: '0.75rem' } }}
+                      sx={{ mt: 2, fontSize: { xs: '0.8rem', md: '0.75rem' } }}
                     >
                       We'll confirm your {isBooking ? 'reservation' : 'inquiry'} within 24 hours. 
                       For urgent requests, please call us directly.
@@ -721,7 +784,6 @@ export default function ContactBooking() {
                       {[
                         { day: 'Monday - Friday', hours: '7:00 AM - 10:00 PM' },
                         { day: 'Saturday - Sunday', hours: '7:00 AM - 10:00 PM' },
-                        // { day: 'Sunday', hours: '9:00 AM - 10:00 PM' }
                       ].map((item, index) => (
                         <Box 
                           key={index}
@@ -777,4 +839,3 @@ export default function ContactBooking() {
     </Box>
   );
 }
-        

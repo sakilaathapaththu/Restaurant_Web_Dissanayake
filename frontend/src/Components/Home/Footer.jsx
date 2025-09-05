@@ -194,7 +194,7 @@ const handleSocialClick = (platform) => {
     instagram: 'https://instagram.com/dissanyakebakers',
     facebook: 'https://facebook.com/dissanyakebakers',
     tiktok: 'https://tiktok.com/@dissanyakebakers',
-    whatsapp: 'https://wa.me/0777506319',
+    whatsapp: 'https://wa.me/94777506319',
     };
     
     window.open(urls[platform], '_blank', 'noopener,noreferrer');
@@ -331,6 +331,10 @@ return (
                     onClick={handleBlackCodeClick}
                     role="button"
                     tabIndex={0}
+                    sx={{
+                        fontSize: '0.9rem', 
+                        display: 'inline-block', 
+                    }}
                     >
                     BlackCode Devs
                     </BlackCodeLink>
@@ -358,7 +362,7 @@ return (
                 </Typography>
                 </Grid>
                 
-                <Grid item xs={12} md={4}>
+                {/* <Grid item xs={12} md={4}>
                 <Box
                     sx={{
                     display: 'flex',
@@ -382,7 +386,7 @@ return (
                     BlackCode Devs
                     </BlackCodeLink>
                 </Box>
-                </Grid>
+                </Grid> */}
             </Grid>
             </CopyrightSection>
         </Fade>

@@ -68,20 +68,47 @@ const ViewOrders = () => {
   const handleViewOrder = (order) => { setSelectedOrder(order); setDialogOpen(true); };
 
   // ✅ require time + send with update
-  const handleConfirmWithTime = async (order) => {
-    const t = pickupTimes[order._id];
-    if (!t) return alert('Please set a pickup time before confirming this order.');
-    try {
-      setUpdatingOrder(order._id);
-      await orderService.updateOrderStatus(order._id, { status: 'confirmed', pickupTime: t });
-      await loadOrders(); await loadStats();
-      if (selectedOrder?._id === order._id) { setDialogOpen(false); setSelectedOrder(null); }
-    } catch (e) {
-      alert(e.message || 'Failed to confirm order');
-    } finally {
-      setUpdatingOrder(null);
+  // const handleConfirmWithTime = async (order) => {
+  //   const t = pickupTimes[order._id];
+  //   if (!t) return alert('Please set a pickup time before confirming this order.');
+  //   try {
+  //     setUpdatingOrder(order._id);
+  //     await orderService.updateOrderStatus(order._id, { status: 'confirmed', pickupTime: t });
+  //     await loadOrders(); await loadStats();
+  //     if (selectedOrder?._id === order._id) { setDialogOpen(false); setSelectedOrder(null); }
+  //   } catch (e) {
+  //     alert(e.message || 'Failed to confirm order');
+  //   } finally {
+  //     setUpdatingOrder(null);
+  //   }
+  // };
+const handleConfirmWithTime = async (order) => {
+  const t = pickupTimes[order._id];
+  if (!t) return alert('Please set a pickup time before confirming this order.');
+  try {
+    setUpdatingOrder(order._id);
+
+    const resp = await orderService.updateOrderStatus(order._id, {
+      status: 'confirmed',
+      pickupTime: t
+    });
+
+    const ws = resp?.whatsapp || resp?.data?.whatsapp;
+    if (ws?.sent) {
+      alert('Order confirmed and WhatsApp “Hello” sent ✅');
+    } else {
+      alert(`Order confirmed, but WhatsApp failed ❌ ${ws?.error ? '\n'+ws.error : ''}`);
     }
-  };
+
+    await loadOrders();
+    await loadStats();
+    if (selectedOrder?._id === order._id) { setDialogOpen(false); setSelectedOrder(null); }
+  } catch (e) {
+    alert(e.message || 'Failed to confirm order');
+  } finally {
+    setUpdatingOrder(null);
+  }
+};
 
   const handleCancel = async (order) => {
     try {
