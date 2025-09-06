@@ -20,6 +20,7 @@ import InquiriesList from "./Pages/admin/InquiriesList";
 import CheckoutPage from "./Pages/CheckoutPage";
 import MyOrdersPage from "./Pages/MyOrdersPage";
 import ViewOrders from "./Pages/admin/orders/ViewOrders";
+import Settings from "./Pages/admin/Settings";
 import ScrollToTopButton from "./Components/ScrollToTopButton";
 
 const theme = createTheme({
@@ -123,6 +124,16 @@ export default function App() {
               <ProtectedRoute>
                 <RequireRole roles={["superadmin", "editor"]}>
                   <ViewOrders />
+                </RequireRole>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <RequireRole roles={["superadmin"]}>
+                  <Settings />
                 </RequireRole>
               </ProtectedRoute>
             }

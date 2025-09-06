@@ -7,7 +7,7 @@ const { sendOrderConfirmation } = require('../services/whatsapp');
 // Create a new order from cart
 const createOrder = async (req, res) => {
     try {
-        const { userId, customerName, customerPhone, address } = req.body;
+        const { userId, customerName, customerPhone, address, orderType, totalAmount, deliveryFee, grandTotal, paymentMethod, paymentStatus } = req.body;
 
         // Validate required fields
         if (!userId || !customerName || !customerPhone || !address) {
@@ -26,11 +26,11 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // Calculate totals
-        const totalAmount = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-        const deliveryFee = 0; // Fixed delivery fee
+        // Calculate totals (use provided values or calculate from cart)
+        const calculatedTotalAmount = totalAmount || cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+        const calculatedDeliveryFee = deliveryFee || 0;
         const serviceCharge = 0; // Fixed service charge
-        const grandTotal = totalAmount + deliveryFee + serviceCharge;
+        const calculatedGrandTotal = grandTotal || (calculatedTotalAmount + calculatedDeliveryFee + serviceCharge);
 
         // Create order items from cart
         const orderItems = cart.items.map(item => ({
@@ -47,15 +47,16 @@ const createOrder = async (req, res) => {
         const order = new Order({
             userId,
             items: orderItems,
-            totalAmount,
-            deliveryFee,
+            totalAmount: calculatedTotalAmount,
+            deliveryFee: calculatedDeliveryFee,
             serviceCharge,
-            grandTotal,
+            grandTotal: calculatedGrandTotal,
             customerName,
             customerPhone,
             address,
-            orderType: 'pickup', // Default to delivery
-            paymentMethod: 'cash' // Default to cash on delivery
+            orderType: orderType || 'pickup',
+            paymentMethod: paymentMethod || 'cash',
+            paymentStatus: paymentStatus || 'pending'
         });
 
         await order.save();
@@ -245,75 +246,75 @@ const getOrderById = async (req, res) => {
 
 
 const updateOrderStatus = async (req, res) => {
-  try {
-    // accept either :orderId or :id
-    const { orderId, id } = req.params;
-    const theId = orderId || id;
+    try {
+        // accept either :orderId or :id
+        const { orderId, id } = req.params;
+        const theId = orderId || id;
 
-    const { status, estimatedDeliveryTime, pickupTime } = req.body;
-    if (!status) {
-      return res.status(400).json({ success: false, message: 'Status is required' });
+        const { status, estimatedDeliveryTime, pickupTime } = req.body;
+        if (!status) {
+            return res.status(400).json({ success: false, message: 'Status is required' });
+        }
+
+        // Build update payload (keeps your previous behavior)
+        const updateData = { status };
+        if (estimatedDeliveryTime) updateData.estimatedDeliveryTime = estimatedDeliveryTime;
+        if (pickupTime) updateData.pickupTime = pickupTime;
+
+        if (status === 'delivered') {
+            updateData.actualDeliveryTime = new Date();
+        }
+
+        const order = await Order.findByIdAndUpdate(
+            theId,
+            updateData,
+            { new: true, runValidators: true }
+        ).populate('items.foodId', 'name image');
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // WhatsApp on confirm
+        let whatsapp = { sent: false };
+        // if (order.status === 'confirmed' && order.customerPhone) {
+        //   try {
+        //     await sendOrderConfirmation({
+        //       phone: order.customerPhone,
+        //       orderId: order._id,
+        //       pickupTime: order.pickupTime || pickupTime,
+        //     });
+        //     whatsapp = { sent: true };
+        //   } catch (waErr) {
+        //     console.error('WhatsApp send failed:', waErr?.message || waErr);
+        //     whatsapp = { sent: false, error: String(waErr?.message || waErr) };
+        //   }
+        // }    
+        if (order.status === 'confirmed' && order.customerPhone) {
+            try {
+                await sendOrderConfirmation(order);   // ← pass full order
+                whatsapp = { sent: true };
+            } catch (waErr) {
+                console.error('WhatsApp send failed:', waErr?.message || waErr);
+                whatsapp = { sent: false, error: String(waErr?.message || waErr) };
+            }
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Order status updated successfully',
+            data: order,
+            whatsapp, // frontend can check this
+        });
+
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+        });
     }
-
-    // Build update payload (keeps your previous behavior)
-    const updateData = { status };
-    if (estimatedDeliveryTime) updateData.estimatedDeliveryTime = estimatedDeliveryTime;
-    if (pickupTime) updateData.pickupTime = pickupTime;
-
-    if (status === 'delivered') {
-      updateData.actualDeliveryTime = new Date();
-    }
-
-    const order = await Order.findByIdAndUpdate(
-      theId,
-      updateData,
-      { new: true, runValidators: true }
-    ).populate('items.foodId', 'name image');
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-
-    // WhatsApp on confirm
-    let whatsapp = { sent: false };
-    // if (order.status === 'confirmed' && order.customerPhone) {
-    //   try {
-    //     await sendOrderConfirmation({
-    //       phone: order.customerPhone,
-    //       orderId: order._id,
-    //       pickupTime: order.pickupTime || pickupTime,
-    //     });
-    //     whatsapp = { sent: true };
-    //   } catch (waErr) {
-    //     console.error('WhatsApp send failed:', waErr?.message || waErr);
-    //     whatsapp = { sent: false, error: String(waErr?.message || waErr) };
-    //   }
-    // }
-    if (order.status === 'confirmed' && order.customerPhone) {
-  try {
-    await sendOrderConfirmation(order);   // ← pass full order
-    whatsapp = { sent: true };
-  } catch (waErr) {
-    console.error('WhatsApp send failed:', waErr?.message || waErr);
-    whatsapp = { sent: false, error: String(waErr?.message || waErr) };
-  }
-}
-
-    return res.status(200).json({
-      success: true,
-      message: 'Order status updated successfully',
-      data: order,
-      whatsapp, // frontend can check this
-    });
-
-  } catch (error) {
-    console.error('Error updating order status:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error',
-      error: error.message,
-    });
-  }
 };
 
 // Cancel order
