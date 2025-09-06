@@ -5,9 +5,9 @@ const morgan = require("morgan");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
-require('dotenv').config({ override: true }); 
+require('dotenv').config({ override: true });
 const { logWhatsAppBootInfo } = require('./services/whatsapp');
-logWhatsAppBootInfo(); 
+logWhatsAppBootInfo();
 
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
 // app.use(cors({ origin: process.env.CORS_ORIGIN || "http://72.60.42.120:3000" }));
@@ -47,6 +47,9 @@ app.use('/api/cart', cartRoutes);
 
 const orderRoutes = require('./routes/orderRoutes');
 app.use('/api/orders', orderRoutes);
+
+const settingsRoutes = require('./routes/settingsRoutes');
+app.use('/api/settings', settingsRoutes);
 
 // health
 app.get("/", (_req, res) => res.json({ ok: true }));
