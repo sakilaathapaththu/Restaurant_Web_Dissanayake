@@ -499,6 +499,11 @@ import {
   CircularProgress,
   Chip,
   Stack,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormControl,
+  FormLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
@@ -507,7 +512,8 @@ import cartService from "../services/cartService";
 import HomepageNavbar from "../Components/Navbar/Homepagenavbar";
 import Footer from "../Components/Home/Footer";
 import InputAdornment from "@mui/material/InputAdornment";
-
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import MyLocationIcon from "@mui/icons-material/MyLocation";
 
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -534,23 +540,97 @@ const CheckoutPage = () => {
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [otpErr, setOtpErr] = useState("");
 
-
+  // Settings state
+  const [settings, setSettings] = useState({
+    deliveryEnabled: true,
+    deliveryFee: 0,
+    minOrderAmount: 0
+  });
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     customerName: "",
     customerPhone: "",
     address: "",
+    orderType: "pickup", // Default to pickup
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [locationLoading, setLocationLoading] = useState(false);
 
   useEffect(() => {
     if (items.length === 0) {
       navigate("/menu");
     }
+    loadSettings();
   }, [items, navigate]);
+
+  const loadSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      const response = await api.get('/settings');
+      if (response.data.success) {
+        const settingsData = response.data.data;
+        setSettings({
+          deliveryEnabled: settingsData.deliveryEnabled ?? true,
+          deliveryFee: settingsData.deliveryFee ?? 0,
+          minOrderAmount: settingsData.minOrderAmount ?? 0
+        });
+
+        // If delivery is disabled, force pickup
+        if (!settingsData.deliveryEnabled) {
+          setFormData(prev => ({ ...prev, orderType: "pickup" }));
+        }
+      }
+    } catch (err) {
+      console.error('Error loading settings:', err);
+      // Default to pickup if settings fail to load
+      setFormData(prev => ({ ...prev, orderType: "pickup" }));
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    setLocationLoading(true);
+    setError('');
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+
+          // Use a reverse geocoding service (you can replace with your preferred service)
+          const response = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          const data = await response.json();
+
+          if (data.locality && data.city) {
+            const address = `${data.locality}, ${data.city}, ${data.principalSubdivision}, ${data.countryName}`;
+            setFormData(prev => ({ ...prev, address }));
+          } else {
+            setError('Could not determine address from location.');
+          }
+        } catch (err) {
+          setError('Error fetching address from location.');
+        } finally {
+          setLocationLoading(false);
+        }
+      },
+      (error) => {
+        setError('Error getting location: ' + error.message);
+        setLocationLoading(false);
+      }
+    );
+  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -588,6 +668,12 @@ const CheckoutPage = () => {
       return;
     }
     if (!formData.address.trim()) { setError("Address is required"); return; }
+
+    // Validate delivery minimum order amount
+    if (formData.orderType === "delivery" && settings.minOrderAmount > 0 && totalAmount < settings.minOrderAmount) {
+      setError(`Minimum order amount for delivery is LKR ${settings.minOrderAmount.toLocaleString()}`);
+      return;
+    }
 
     // 1) send OTP (don’t create order yet)
     try {
@@ -630,10 +716,20 @@ const CheckoutPage = () => {
       // ✅ OTP ok → proceed with your original order creation
       setLoading(true);
       const guestUserId = cartService.generateGuestUserId();
+
+      // Calculate delivery fee
+      const deliveryFee = formData.orderType === "delivery" ? settings.deliveryFee : 0;
+      const grandTotal = totalAmount + deliveryFee;
+
       const orderData = {
         userId: guestUserId,
         ...formData,
         customerPhone: toSriLankaMSISDN(formData.customerPhone), // store as 94xxxxxxxxx
+        totalAmount,
+        deliveryFee,
+        grandTotal,
+        paymentMethod: "cash", // Default payment method
+        paymentStatus: "pending"
       };
 
       const response = await orderService.createOrder(orderData);
@@ -652,7 +748,7 @@ const CheckoutPage = () => {
       setLoading(false);
     }
   };
- const handleResendOtp = async () => {
+  const handleResendOtp = async () => {
     try {
       setOtpErr("");
       setOtpSending(true);
@@ -669,9 +765,31 @@ const CheckoutPage = () => {
       setOtpSending(false);
     }
   };
-  const grandTotal = totalAmount;
+
+  const deliveryFee = formData.orderType === "delivery" ? settings.deliveryFee : 0;
+  const grandTotal = totalAmount + deliveryFee;
 
   if (items.length === 0) return null;
+
+  if (settingsLoading) {
+    return (
+      <>
+        <HomepageNavbar />
+        <Box
+          sx={{
+            minHeight: "100vh",
+            backgroundColor: "#FFF3E8",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress size={60} sx={{ color: "#fda021" }} />
+        </Box>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -850,6 +968,23 @@ const CheckoutPage = () => {
                       LKR {totalAmount.toLocaleString()}
                     </Typography>
                   </Box>
+
+                  {deliveryFee > 0 && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ color: "#2c1000" }}>
+                        Delivery Fee
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        LKR {deliveryFee.toLocaleString()}
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
 
                 <Divider sx={{ mb: 3 }} />
@@ -972,6 +1107,66 @@ const CheckoutPage = () => {
                         },
                       }}
                     />
+
+                    {/* Order Type Selection */}
+                    <FormControl component="fieldset" sx={{ mb: 3 }}>
+                      <FormLabel component="legend" sx={{ color: "#2c1000", fontWeight: 600, mb: 2 }}>
+                        Order Type
+                      </FormLabel>
+                      <RadioGroup
+                        value={formData.orderType}
+                        onChange={(e) => handleInputChange("orderType", e.target.value)}
+                        row
+                      >
+                        <FormControlLabel
+                          value="pickup"
+                          control={<Radio sx={{ color: "#fda021" }} />}
+                          label="Pickup"
+                        />
+                        {settings.deliveryEnabled && (
+                          <FormControlLabel
+                            value="delivery"
+                            control={<Radio sx={{ color: "#fda021" }} />}
+                            label="Delivery"
+                          />
+                        )}
+                      </RadioGroup>
+                      {!settings.deliveryEnabled && (
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                          Delivery is currently unavailable
+                        </Typography>
+                      )}
+                    </FormControl>
+
+                    {/* Address Section */}
+                    <Box sx={{ mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: "#2c1000" }}>
+                          {formData.orderType === "delivery" ? "Delivery Address" : "Address"}
+                        </Typography>
+                        {(
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            startIcon={locationLoading ? <CircularProgress size={16} /> : <MyLocationIcon />}
+                            onClick={getCurrentLocation}
+                            disabled={locationLoading}
+                            sx={{
+                              borderColor: "#fda021",
+                              color: "#fda021",
+                              "&:hover": {
+                                borderColor: "#e8d5c4",
+                                backgroundColor: "#e8d5c4",
+                                color: "#2c1000"
+                              }
+                            }}
+                          >
+                            {locationLoading ? "Getting Location..." : "Use My Location"}
+                          </Button>
+                        )}
+                      </Box>
+                    </Box>
+
                     <TextField
                       fullWidth
                       label="Address"
@@ -983,7 +1178,7 @@ const CheckoutPage = () => {
                       multiline
                       rows={4}
                       variant="outlined"
-                      placeholder="Enter your complete address"
+                      placeholder={formData.orderType === "delivery" ? "Enter your complete delivery address" : "Enter pickup address or leave blank for restaurant address"}
                       sx={{
                         "& .MuiOutlinedInput-root": {
                           borderRadius: 1,
@@ -999,6 +1194,9 @@ const CheckoutPage = () => {
                         },
                       }}
                     />
+
+
+
 
                     <Button
                       type="submit"
@@ -1031,51 +1229,51 @@ const CheckoutPage = () => {
             </Box>
           </Box>
           {/* OTP Dialog (new, small) */}
-      <Dialog open={otpOpen} onClose={() => setOtpOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ pr: 5 }}>
-          Verify your number
-          <IconButton
-            aria-label="close"
-            onClick={() => setOtpOpen(false)}
-            sx={{ position: "absolute", right: 8, top: 8 }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+          <Dialog open={otpOpen} onClose={() => setOtpOpen(false)} fullWidth maxWidth="xs">
+            <DialogTitle sx={{ pr: 5 }}>
+              Verify your number
+              <IconButton
+                aria-label="close"
+                onClick={() => setOtpOpen(false)}
+                sx={{ position: "absolute", right: 8, top: 8 }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
 
-        <DialogContent>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            We sent a 6-digit code to <b>+94 {formData.customerPhone}</b>.
-          </Typography>
-          <TextField
-            fullWidth
-            label="Enter OTP"
-            value={otpCode}
-            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            inputProps={{ inputMode: "numeric", maxLength: 6 }}
-            placeholder="••••••"
-          />
-          {otpErr && (
-            <Alert severity="error" sx={{ mt: 2 }} onClose={() => setOtpErr("")}>
-              {otpErr}
-            </Alert>
-          )}
-        </DialogContent>
+            <DialogContent>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                We sent a 6-digit code to <b>+94 {formData.customerPhone}</b>.
+              </Typography>
+              <TextField
+                fullWidth
+                label="Enter OTP"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                inputProps={{ inputMode: "numeric", maxLength: 6 }}
+                placeholder="••••••"
+              />
+              {otpErr && (
+                <Alert severity="error" sx={{ mt: 2 }} onClose={() => setOtpErr("")}>
+                  {otpErr}
+                </Alert>
+              )}
+            </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-          <Button onClick={handleResendOtp} disabled={otpSending}>
-            {otpSending ? "Resending…" : "Resend Code"}
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleVerifyOtp}
-            disabled={otpVerifying}
-            sx={{ backgroundColor: "#fda021", "&:hover": { backgroundColor: "#e8d5c4", color: "#2c1000" } }}
-          >
-            {otpVerifying ? "Verifying…" : "Verify & Place Order"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+              <Button onClick={handleResendOtp} disabled={otpSending}>
+                {otpSending ? "Resending…" : "Resend Code"}
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleVerifyOtp}
+                disabled={otpVerifying}
+                sx={{ backgroundColor: "#fda021", "&:hover": { backgroundColor: "#e8d5c4", color: "#2c1000" } }}
+              >
+                {otpVerifying ? "Verifying…" : "Verify & Place Order"}
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Container>
       </Box>
       <Footer />

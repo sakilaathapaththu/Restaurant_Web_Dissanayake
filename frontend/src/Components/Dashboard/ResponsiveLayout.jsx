@@ -24,6 +24,7 @@ const navItems = [
   { label: "Categories", icon: <ChartIcon />, to: "/categories" },
   { label: "Inquiries", icon: <MailIcon />, to: "/inquiries" },
   { label: "Add Admin", icon: <WorkIcon />, to: "/admins/create", roles: ["superadmin"] },
+  { label: "Settings", icon: <WorkIcon />, to: "/settings", roles: ["superadmin"] },
 ];
 
 export default function ResponsiveLayout({
